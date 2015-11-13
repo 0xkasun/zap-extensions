@@ -295,6 +295,7 @@
 		<build-addon name="highlighter" />
 		<build-addon name="httpsInfo" />
 		<build-addon name="importLogFiles" />
+		<build-addon name="jiraIssueCreater" />
 		<build-addon name="pscanrulesAlpha" >
 				<!-- Add the extra classes required -->
 				<jar jarfile="${dist}/${file}" update="true" compress="true">
