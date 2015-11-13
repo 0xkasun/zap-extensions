@@ -11,9 +11,9 @@
 	<ascanrules/>
 	<pscanrules/>
 	<filters/>
-	<files>
-		<file>files.example/ExampleFile.txt</file>
-	</files>
+	<!--<files>-->
+	<!--<file>files.example/ExampleFile.txt</file>-->
+	<!--</files>-->
 	<not-before-version>2.4.2</not-before-version>
 	<not-from-version></not-from-version>
 </zapaddon>

@@ -45,9 +45,9 @@ public class ExtensionJiraIssueCreater extends ExtensionAdaptor {
 
     // The i18n prefix, by default the package name - defined in one place to make it easier
     // to copy and change this example
-    protected static final String PREFIX = "simpleExample";
+    protected static final String PREFIX = "jiraIssueCreater";
 
-    private static final String RESOURCE = "/org/zaproxy/zap/extension/simpleExample/resources";
+    private static final String RESOURCE = "/org/zaproxy/zap/extension/jiraIssueCreater/resources";
 
     private static final ImageIcon ICON = new ImageIcon(
             ExtensionJiraIssueCreater.class.getResource( RESOURCE + "/cake.png"));
@@ -91,7 +91,7 @@ public class ExtensionJiraIssueCreater extends ExtensionAdaptor {
         if (getView() != null) {
             // Register our top menu item, as long as we're not running as a daemon
             // Use one of the other methods to add to a different menu list
-            extensionHook.getHookMenu().addToolsMenuItem(getMenuExample());
+            extensionHook.getHookMenu().addReportMenuItem(getMenuExample());
             // Register our popup menu item
 //	    	extensionHook.getHookMenu().addPopupMenuItem(getPopupMsgMenuExample());
             // Register a
@@ -118,7 +118,7 @@ public class ExtensionJiraIssueCreater extends ExtensionAdaptor {
 
     private ZapMenuItem getMenuExample() {
         if (menuExample == null) {
-            menuExample = new ZapMenuItem(PREFIX + ".topmenu.tools.title");
+            menuExample = new ZapMenuItem(PREFIX + ".topmenu.report.title");
 
             menuExample.addActionListener(new java.awt.event.ActionListener() {
                 @Override
@@ -150,9 +150,15 @@ public class ExtensionJiraIssueCreater extends ExtensionAdaptor {
 //						View.getSingleton().showMessageDialog("Done creting issues!!");
 //					}
 
-                    ExportToJira form =new ExportToJira();
-                    form.setTitle("Export Issues to JIRA");
-                    form.show();;
+                    File credentialFile = new File("resources/cred.txt");
+                    if (credentialFile.exists() && !(credentialFile.isDirectory())) {
+                        ExportToJira form = new ExportToJira();
+                        form.setTitle("Export Issues to JIRA");
+                        form.show();
+
+                    } else {
+                        View.getSingleton().showWarningDialog("The credential file is missing!!");
+                    }
 
 
 
