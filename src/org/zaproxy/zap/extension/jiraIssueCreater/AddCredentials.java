@@ -5,6 +5,8 @@
  */
 package org.zaproxy.zap.extension.jiraIssueCreater;
 
+import javax.swing.*;
+
 /**
  * @author kausn
  */
@@ -77,7 +79,7 @@ public class AddCredentials extends javax.swing.JFrame {
         jPasswordField2 = new javax.swing.JPasswordField();
         btnCreateCredentials = new javax.swing.JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
 
         jLabel1.setText("Jira Home URL");
 

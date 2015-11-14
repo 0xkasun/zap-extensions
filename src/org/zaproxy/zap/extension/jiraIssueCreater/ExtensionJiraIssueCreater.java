@@ -27,11 +27,12 @@ import org.zaproxy.zap.view.ZapMenuItem;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.File;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.text.MessageFormat;
+import java.util.Properties;
 
 /*
  * An example ZAP extension which adds a top level menu item. 
@@ -150,14 +151,37 @@ public class ExtensionJiraIssueCreater extends ExtensionAdaptor {
 //						View.getSingleton().showMessageDialog("Done creting issues!!");
 //					}
 
-                    File credentialFile = new File("resources/cred.txt");
+                    File credentialFile = new File("resources/cred.properties");
+                    Properties prop = new Properties();
+                    InputStream input = null;
+
+
                     if (credentialFile.exists() && !(credentialFile.isDirectory())) {
+                        try {
+
+                            input = new FileInputStream(credentialFile);
+                            prop.load(input);
+
+                            System.out.println(prop.getProperty("jiraUrl"));
+                            System.out.println(prop.getProperty("username"));
+                            System.out.println(prop.getProperty("password"));
+
+                        } catch (FileNotFoundException e) {
+//                            e.printStackTrace();
+                        } catch (IOException e) {
+//                            e.printStackTrace();
+                        }
                         ExportToJira form = new ExportToJira();
                         form.setTitle("Export Issues to JIRA");
                         form.show();
 
                     } else {
-                        View.getSingleton().showWarningDialog("The credential file is missing!!");
+                        AddCredentials credentalForm = new AddCredentials();
+                        credentalForm.setTitle("Set-up your Credentials");
+                        credentalForm.show();
+
+
+//                        View.getSingleton().showWarningDialog("The credential file is missing!!");
                     }
 
 
