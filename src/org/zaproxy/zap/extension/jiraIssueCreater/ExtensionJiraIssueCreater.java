@@ -1,19 +1,19 @@
 /*
  * Zed Attack Proxy (ZAP) and its related class files.
- * 
+ *
  * ZAP is an HTTP/HTTPS proxy for assessing web application security.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License"); 
- * you may not use this file except in compliance with the License. 
- * You may obtain a copy of the License at 
- * 
- *   http://www.apache.org/licenses/LICENSE-2.0 
- *   
- * Unless required by applicable law or agreed to in writing, software 
- * distributed under the License is distributed on an "AS IS" BASIS, 
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
- * See the License for the specific language governing permissions and 
- * limitations under the License. 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.zaproxy.zap.extension.jiraIssueCreater;
 
@@ -35,8 +35,8 @@ import java.text.MessageFormat;
 import java.util.Properties;
 
 /*
- * An example ZAP extension which adds a top level menu item. 
- * 
+ * An example ZAP extension which adds a top level menu item.
+ *
  * This class is defines the extension.
  */
 public class ExtensionJiraIssueCreater extends ExtensionAdaptor {
@@ -52,6 +52,8 @@ public class ExtensionJiraIssueCreater extends ExtensionAdaptor {
 
     private static final ImageIcon ICON = new ImageIcon(
             ExtensionJiraIssueCreater.class.getResource( RESOURCE + "/cake.png"));
+
+    private static final String PASS_FILE = "resources/cred.properties";
 
 //	private static final String EXAMPLE_FILE = "files.example/ExampleFile.txt";
 //	private static String BASE_URL = "http://localhost:8081";
@@ -151,40 +153,17 @@ public class ExtensionJiraIssueCreater extends ExtensionAdaptor {
 //						View.getSingleton().showMessageDialog("Done creting issues!!");
 //					}
 
-                    File credentialFile = new File("resources/cred.properties");
-                    Properties prop = new Properties();
-                    InputStream input = null;
+                   String zap_home=Constant.getZapHome();
+                    File cred_file=new File(zap_home+"/cred.properties");
+                    if(cred_file.exists()){ //if file exists read from file
+                        //get credentials
+                    }else{
+//                        View.getSingleton().showWarningDialog(Constant.getZapHome());
+                        CredentialForm credForm= new CredentialForm();
+                        credForm.setTitle("Credential Form ");
+                        credForm.show();
 
-
-                    if (credentialFile.exists() && !(credentialFile.isDirectory())) {
-                        try {
-
-                            input = new FileInputStream(credentialFile);
-                            prop.load(input);
-
-                            System.out.println(prop.getProperty("jiraUrl"));
-                            System.out.println(prop.getProperty("username"));
-                            System.out.println(prop.getProperty("password"));
-
-                        } catch (FileNotFoundException e) {
-//                            e.printStackTrace();
-                        } catch (IOException e) {
-//                            e.printStackTrace();
-                        }
-                        ExportToJira form = new ExportToJira();
-                        form.setTitle("Export Issues to JIRA");
-                        form.show();
-
-                    } else {
-                        AddCredentials credentalForm = new AddCredentials();
-                        credentalForm.setTitle("Set-up your Credentials");
-                        credentalForm.show();
-
-
-//                        View.getSingleton().showWarningDialog("The credential file is missing!!");
                     }
-
-
 
                     // And display a file included with the add-on in the Output tab
 //            		displayFile(EXAMPLE_FILE);
