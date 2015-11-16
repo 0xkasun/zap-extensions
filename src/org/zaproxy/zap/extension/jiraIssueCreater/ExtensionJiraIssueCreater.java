@@ -156,7 +156,30 @@ public class ExtensionJiraIssueCreater extends ExtensionAdaptor {
                    String zap_home=Constant.getZapHome();
                     File cred_file=new File(zap_home+"/cred.properties");
                     if(cred_file.exists()){ //if file exists read from file
-                        //get credentials
+
+                        Properties prop=new Properties();
+                        InputStream input= null;
+                        try {
+                            input = new FileInputStream(zap_home+"/cred.properties");
+                            prop.load(input);
+                        } catch (FileNotFoundException e) {
+
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+
+                        System.out.println(prop.getProperty("jiraUrl"));
+
+                        if(input!=null){
+
+                            ExportToJira create_issues=new ExportToJira();
+                            create_issues.setTitle("Create Jira Issues");
+                            create_issues.show();
+                        }else{
+                            View.getSingleton().showWarningDialog(Constant.getZapHome()+"input stream null");
+                        }
+
                     }else{
 //                        View.getSingleton().showWarningDialog(Constant.getZapHome());
                         CredentialForm credForm= new CredentialForm();

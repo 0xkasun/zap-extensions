@@ -8,12 +8,17 @@ package org.zaproxy.zap.extension.jiraIssueCreater;
 import com.sun.jersey.core.util.Base64;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.parosproxy.paros.Constant;
 import org.parosproxy.paros.view.View;
 
 
 import javax.naming.AuthenticationException;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
 /**
  * @author kasun
@@ -25,6 +30,7 @@ public class ExportToJira extends JFrame {
      */
     public ExportToJira() {
         initComponents();
+        this.listJiraProjects();
     }
 
     /**
@@ -36,52 +42,24 @@ public class ExportToJira extends JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel1 = new JLabel();
-        cbProjectKeys = new JComboBox();
-        jLabel2 = new JLabel();
-        tbJiraUrl = new JTextField();
-        jLabel3 = new JLabel();
-        tbUserName = new JTextField();
-        jLabel4 = new JLabel();
-        tbPassword = new JPasswordField();
-        jLabel5 = new JLabel();
-        tbProjectLocation = new JTextField();
-        btnChooseReport = new JButton();
-        btnExport = new JButton();
-        btnCancel = new JButton();
-        btnLogin = new JButton();
+        jButton1 = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
+        cbProjectKeys = new javax.swing.JComboBox();
+        jLabel5 = new javax.swing.JLabel();
+        tbProjectLocation = new javax.swing.JTextField();
+        btnChooseReport = new javax.swing.JButton();
+        btnExport = new javax.swing.JButton();
+        btnCancel = new javax.swing.JButton();
 
-        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        jButton1.setText("jButton1");
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jLabel1.setText("Project Key");
 
         cbProjectKeys.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cbProjectKeysActionPerformed(evt);
-            }
-        });
-
-        jLabel2.setText("Jira Home URL");
-
-        tbJiraUrl.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                tbJiraUrlActionPerformed(evt);
-            }
-        });
-
-        jLabel3.setText("Username");
-
-        tbUserName.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                tbUserNameActionPerformed(evt);
-            }
-        });
-
-        jLabel4.setText("Password");
-
-        tbPassword.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                tbPasswordActionPerformed(evt);
             }
         });
 
@@ -115,74 +93,46 @@ public class ExportToJira extends JFrame {
             }
         });
 
-        btnLogin.setText("LogIn");
-        btnLogin.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnLoginActionPerformed(evt);
-            }
-        });
-
-        GroupLayout layout = new GroupLayout(getContentPane());
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addGap(54, 54, 54)
-                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                                        .addComponent(jLabel2)
-                                        .addComponent(jLabel3)
-                                        .addComponent(jLabel4)
-                                        .addComponent(jLabel1)
-                                        .addComponent(jLabel5))
-                                .addGap(81, 81, 81)
-                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addComponent(btnExport, GroupLayout.PREFERRED_SIZE, 124, GroupLayout.PREFERRED_SIZE)
-                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 42, Short.MAX_VALUE)
-                                                .addComponent(btnCancel, GroupLayout.PREFERRED_SIZE, 118, GroupLayout.PREFERRED_SIZE))
-                                        .addComponent(cbProjectKeys, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addGroup(GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                                .addComponent(tbProjectLocation)
-                                                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                                                .addComponent(btnChooseReport))
-                                        .addComponent(tbJiraUrl)
-                                        .addComponent(tbUserName)
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addComponent(tbPassword, GroupLayout.PREFERRED_SIZE, 205, GroupLayout.PREFERRED_SIZE)
-                                                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                                                .addComponent(btnLogin, GroupLayout.PREFERRED_SIZE, 66, GroupLayout.PREFERRED_SIZE)))
-                                .addContainerGap(105, Short.MAX_VALUE))
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(54, 54, 54)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel1)
+                    .addComponent(jLabel5))
+                .addGap(81, 81, 81)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(btnExport, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 42, Short.MAX_VALUE)
+                        .addComponent(btnCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(cbProjectKeys, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(tbProjectLocation)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btnChooseReport)))
+                .addContainerGap(105, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
-                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addGap(19, 19, 19)
-                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                        .addComponent(jLabel2)
-                                        .addComponent(tbJiraUrl, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                                .addGap(18, 18, 18)
-                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                        .addComponent(jLabel3)
-                                        .addComponent(tbUserName, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                                .addGap(15, 15, 15)
-                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                        .addComponent(jLabel4)
-                                        .addComponent(tbPassword)
-                                        .addComponent(btnLogin))
-                                .addGap(18, 18, 18)
-                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                        .addComponent(jLabel1)
-                                        .addComponent(cbProjectKeys, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                                .addGap(18, 18, 18)
-                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                        .addComponent(jLabel5)
-                                        .addComponent(tbProjectLocation, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(btnChooseReport))
-                                .addGap(18, 18, 18)
-                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                        .addComponent(btnExport)
-                                        .addComponent(btnCancel))
-                                .addContainerGap(21, Short.MAX_VALUE))
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(31, 31, 31)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(cbProjectKeys, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel1))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(tbProjectLocation, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnChooseReport))
+                    .addComponent(jLabel5))
+                .addGap(122, 122, 122)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnExport)
+                    .addComponent(btnCancel))
+                .addContainerGap(19, Short.MAX_VALUE))
         );
 
         pack();
@@ -193,11 +143,43 @@ public class ExportToJira extends JFrame {
 //    String auth = new String(Base64.encode("kmbkck1@gmail.com:kmbkck211"));
     static String filePath = "";
 
+    private void listJiraProjects(){
+        try {
 
-    private void tbJiraUrlActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tbJiraUrlActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_tbJiraUrlActionPerformed
+            Properties prop=new Properties();
+            InputStream input=new FileInputStream(Constant.getZapHome()+"/cred.properties");
+            prop.load(input);
 
+            if (!(prop.getProperty("jiraUrl").equals("")) && !(prop.getProperty("jiraUsername").equals("")) && !(prop.getProperty("jiraPass").equals(""))) {
+
+                //Get Projects
+                String BASE_URL = prop.getProperty("jiraUrl");
+                String auth = new String(Base64.encode(prop.getProperty("jiraUsername") + ":" + prop.getProperty("jiraPass")));
+
+//                System.out.println(BASE_URL+"----------"+auth);
+                String projects = JiraRestClient.invokeGetMethod(auth, BASE_URL + "/rest/api/2/project"); // rest call to get the list of projects
+//                System.out.println(projects);
+                JSONArray projectArray = new JSONArray(projects);
+                for (int i = 0; i < projectArray.length(); i++) {
+                    JSONObject proj = projectArray.getJSONObject(i);
+//                System.out.println("Key:" + proj.getString("key") + ", Name:" + proj.getString("name"));
+                    cbProjectKeys.addItem(proj.getString("key") + " - " + proj.getString("name"));// add the projects to the combobox
+                }
+//            } else if (tbPassword.getPassword().toString().equals("")) {
+//                View.getSingleton().showMessageDialog("Enter Password");
+//            } else if (tbJiraUrl.getText().equals("")) {
+//                View.getSingleton().showMessageDialog("Enter Jira Home URL");
+            }else{
+                //TODO add other validations
+                return;
+            }
+        } catch (AuthenticationException e) {
+//            e.printStackTrace();
+            View.getSingleton().showMessageDialog(e.getMessage());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     private void btnChooseReportActionPerformed(java.awt.event.ActionEvent evt) {//Choose .xml or .html file
         JFileChooser reportLocation = new JFileChooser();
@@ -216,51 +198,10 @@ public class ExportToJira extends JFrame {
 
     }
 
-    private void tbUserNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tbUserNameActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_tbUserNameActionPerformed
-
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {// dispose the current screen
         dispose();
     }
-
-    private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {// login with jira credentials
-
-        try {
-
-            if (!(tbPassword.getPassword().toString().equals("")) && !(tbJiraUrl.getText().equals(""))) {
-
-                //Get Projects
-                String BASE_URL = tbJiraUrl.getText();
-                String auth = new String(Base64.encode(tbUserName.getText() + ":" + tbPassword.getText()));
-
-//                System.out.println(BASE_URL+"----------"+auth);
-                String projects = JiraRestClient.invokeGetMethod(auth, BASE_URL + "/rest/api/2/project"); // rest call to get the list of projects
-//                System.out.println(projects);
-                JSONArray projectArray = new JSONArray(projects);
-                for (int i = 0; i < projectArray.length(); i++) {
-                    JSONObject proj = projectArray.getJSONObject(i);
-//                System.out.println("Key:" + proj.getString("key") + ", Name:" + proj.getString("name"));
-                    cbProjectKeys.addItem(proj.getString("key") + " - " + proj.getString("name"));// add the projects to the combobox
-                }
-            } else if (tbPassword.getPassword().toString().equals("")) {
-                View.getSingleton().showMessageDialog("Enter Password");
-            } else if (tbJiraUrl.getText().equals("")) {
-                View.getSingleton().showMessageDialog("Enter Jira Home URL");
-            }else{
-                //TODO add other validations
-                return;
-            }
-        } catch (AuthenticationException e) {
-//            e.printStackTrace();
-            View.getSingleton().showMessageDialog(e.getMessage());
-        }
-
-    }//GEN-LAST:event_btnLoginActionPerformed
-
-    private void tbPasswordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tbPasswordActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_tbPasswordActionPerformed
+    
 
     private void cbProjectKeysActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbProjectKeysActionPerformed
         // TODO add your handling code here:
@@ -273,64 +214,70 @@ public class ExportToJira extends JFrame {
     private void btnExportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportActionPerformed
         // TODO add your handling code here:
 
-        String auth = new String(Base64.encode(tbUserName.getText() + ":" + tbPassword.getText()));
-        String BASE_URL = tbJiraUrl.getText();
-        String[] project_key = cbProjectKeys.getSelectedItem().toString().split(" ");
-        System.out.println(project_key[0]);
-        String issueList[];
-        JiraRestClient jira = new JiraRestClient();
-        int issueCount;
-        String issue;
+//        String auth = new String(Base64.encode(tbUserName.getText() + ":" + tbPassword.getText()));
+//        String BASE_URL = tbJiraUrl.getText();
+//        String[] project_key = cbProjectKeys.getSelectedItem().toString().split(" ");
+//        System.out.println(project_key[0]);
+//        String issueList[];
+//        JiraRestClient jira = new JiraRestClient();
+//        int issueCount;
+//        String issue;
+//
+//
+//        try {
+//
+//            if (filePath.contains(".xml")) {
+//
+//                //to parse xml
+//
+//                XmlDomParser xmlParser = new XmlDomParser();
+//                issueList = xmlParser.parseXmlDoc(project_key[0], filePath);
+//
+//
+//                issueCount = Integer.parseInt(issueList[999]);
+//                for (int i = 0; i < issueCount; i++) { //create Issues in jira
+//                    System.out.println("Issuelist " + i + issueList[i]);
+//                    issue = jira.invokePostMethod(auth, BASE_URL + "/rest/api/2/issue", issueList[i]);
+//                    filePath="";
+//                    System.out.println(issue);
+////                    View.getSingleton().showMessageDialog("Done creting issues!!");
+//                }
+//
+//            } else if (filePath.contains(".html")) {
+//
+//                HtmlParser htmlParser = new HtmlParser();
+//                issueList = htmlParser.CreateIssueList(htmlParser.ReadHtmldoc(filePath), project_key[0]);
+//
+//
+//                issueCount = Integer.parseInt(issueList[999]);
+//                for (int i = 0; i < issueCount; i++) { //create Issues in jira
+//                    System.out.println("Issuelist " + i + issueList[i]);
+//                    issue = jira.invokePostMethod(auth, BASE_URL + "/rest/api/2/issue", issueList[i]);
+//                    filePath="";
+//                    System.out.println(issue);
+////                    View.getSingleton().showMessageDialog("Done creting issues!!");
+//
+//
+//                }
+//            }else if(filePath.equals("")){
+//                View.getSingleton().showMessageDialog("Please Select a report file !!");
+//            }
+//            }catch(AuthenticationException e1){
+//                e1.printStackTrace();
+//            }
+//            finally{
+//            View.getSingleton().showMessageDialog("Done creting issues!!");
+//                this.dispose();
+//            }
 
 
-        try {
-
-            if (filePath.contains(".xml")) {
-
-                //to parse xml
-
-                XmlDomParser xmlParser = new XmlDomParser();
-                issueList = xmlParser.parseXmlDoc(project_key[0], filePath);
 
 
-                issueCount = Integer.parseInt(issueList[999]);
-                for (int i = 0; i < issueCount; i++) { //create Issues in jira
-                    System.out.println("Issuelist " + i + issueList[i]);
-                    issue = jira.invokePostMethod(auth, BASE_URL + "/rest/api/2/issue", issueList[i]);
-                    filePath="";
-                    System.out.println(issue);
-//                    View.getSingleton().showMessageDialog("Done creting issues!!");
-                }
-
-            } else if (filePath.contains(".html")) {
-
-                HtmlParser htmlParser = new HtmlParser();
-                issueList = htmlParser.CreateIssueList(htmlParser.ReadHtmldoc(filePath), project_key[0]);
-
-
-                issueCount = Integer.parseInt(issueList[999]);
-                for (int i = 0; i < issueCount; i++) { //create Issues in jira
-                    System.out.println("Issuelist " + i + issueList[i]);
-                    issue = jira.invokePostMethod(auth, BASE_URL + "/rest/api/2/issue", issueList[i]);
-                    filePath="";
-                    System.out.println(issue);
-//                    View.getSingleton().showMessageDialog("Done creting issues!!");
-
-
-                }
-            }else if(filePath.equals("")){
-                View.getSingleton().showMessageDialog("Please Select a report file !!");
-            }
-            }catch(AuthenticationException e1){
-                e1.printStackTrace();
-            }
-            finally{
-            View.getSingleton().showMessageDialog("Done creting issues!!");
-                this.dispose();
-            }
 
 
         }//GEN-LAST:event_btnExportActionPerformed
+
+
 
         /**
          * @param args the command line arguments
@@ -369,19 +316,13 @@ public class ExportToJira extends JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private JButton btnCancel;
-    private JButton btnChooseReport;
-    private JButton btnExport;
-    private JButton btnLogin;
-    private JComboBox cbProjectKeys;
-    private JLabel jLabel1;
-    private JLabel jLabel2;
-    private JLabel jLabel3;
-    private JLabel jLabel4;
-    private JLabel jLabel5;
-    private JTextField tbJiraUrl;
-    private JPasswordField tbPassword;
-    private JTextField tbProjectLocation;
-    private JTextField tbUserName;
+    private javax.swing.JButton btnCancel;
+    private javax.swing.JButton btnChooseReport;
+    private javax.swing.JButton btnExport;
+    private javax.swing.JComboBox cbProjectKeys;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JTextField tbProjectLocation;
     // End of variables declaration//GEN-END:variables
 }
