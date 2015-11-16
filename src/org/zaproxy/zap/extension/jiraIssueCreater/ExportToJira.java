@@ -11,7 +11,6 @@ import org.json.JSONObject;
 import org.parosproxy.paros.Constant;
 import org.parosproxy.paros.view.View;
 
-
 import javax.naming.AuthenticationException;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -26,12 +25,61 @@ import java.util.Properties;
  */
 public class ExportToJira extends JFrame {
 
+    //    private static String BASE_URL = "http://localhost:8081";
+//    String auth = new String(Base64.encode("kmbkck1@gmail.com:kmbkck211"));
+    static String filePath = "";
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnCancel;
+    private javax.swing.JButton btnChooseReport;
+    private javax.swing.JButton btnExport;
+    private javax.swing.JComboBox cbProjectKeys;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JTextField tbProjectLocation;
+
     /**
      * Creates new form ExportToJira
      */
     public ExportToJira() {
         initComponents();
         this.listJiraProjects();
+    }
+
+        /**
+         * @param args the command line arguments
+         */
+
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(ExportToJira.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(ExportToJira.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(ExportToJira.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(ExportToJira.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new ExportToJira().setVisible(true);
+            }
+        });
     }
 
     /**
@@ -97,58 +145,53 @@ public class ExportToJira extends JFrame {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(54, 54, 54)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1)
-                    .addComponent(jLabel5))
-                .addGap(81, 81, 81)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnExport, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 42, Short.MAX_VALUE)
-                        .addComponent(btnCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(cbProjectKeys, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(tbProjectLocation)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(btnChooseReport)))
-                .addContainerGap(105, Short.MAX_VALUE))
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addGap(54, 54, 54)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jLabel1)
+                                        .addComponent(jLabel5))
+                                .addGap(81, 81, 81)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addComponent(btnExport, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 42, Short.MAX_VALUE)
+                                                .addComponent(btnCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addComponent(cbProjectKeys, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                                .addComponent(tbProjectLocation)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addComponent(btnChooseReport)))
+                                .addContainerGap(105, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(31, 31, 31)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(cbProjectKeys, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel1))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(tbProjectLocation, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(btnChooseReport))
-                    .addComponent(jLabel5))
-                .addGap(122, 122, 122)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnExport)
-                    .addComponent(btnCancel))
-                .addContainerGap(19, Short.MAX_VALUE))
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addGap(31, 31, 31)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(cbProjectKeys, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jLabel1))
+                                .addGap(18, 18, 18)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                .addComponent(tbProjectLocation, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(btnChooseReport))
+                                        .addComponent(jLabel5))
+                                .addGap(122, 122, 122)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(btnExport)
+                                        .addComponent(btnCancel))
+                                .addContainerGap(19, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-
-    //    private static String BASE_URL = "http://localhost:8081";
-//    String auth = new String(Base64.encode("kmbkck1@gmail.com:kmbkck211"));
-    static String filePath = "";
-
-    private void listJiraProjects(){
+    private void listJiraProjects() { //list all the projects in comboBox cbProjectKeys
         try {
 
-            Properties prop=new Properties();
-            InputStream input=new FileInputStream(Constant.getZapHome()+"/cred.properties");
+            Properties prop = new Properties();
+            InputStream input = new FileInputStream(Constant.getZapHome() + "/cred.properties");
             prop.load(input);
 
             if (!(prop.getProperty("jiraUrl").equals("")) && !(prop.getProperty("jiraUsername").equals("")) && !(prop.getProperty("jiraPass").equals(""))) {
@@ -170,7 +213,7 @@ public class ExportToJira extends JFrame {
 //                View.getSingleton().showMessageDialog("Enter Password");
 //            } else if (tbJiraUrl.getText().equals("")) {
 //                View.getSingleton().showMessageDialog("Enter Jira Home URL");
-            }else{
+            } else {
                 //TODO add other validations
                 return;
             }
@@ -180,6 +223,33 @@ public class ExportToJira extends JFrame {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void getAssignees(String project) { //get a list of assignees for a project
+        Properties prop = new Properties();
+        InputStream input = null;
+        try {
+            input = new FileInputStream(Constant.getZapHome() + "/cred.properties");
+            prop.load(input);
+            String BASE_URL = prop.getProperty("jiraUrl");
+            String auth = new String(Base64.encode(prop.getProperty("jiraUsername") + ":" + prop.getProperty("jiraPass")));
+
+            String asignees = JiraRestClient.invokeGetMethod(auth, BASE_URL + "/rest/api/2/user/assignable" +
+                    "/multiProjectSearch?projectKeys=" + project);
+            JSONArray assigneeArray = new JSONArray(asignees);
+
+            for (int i = 0; i < assigneeArray.length(); i++) {
+                JSONObject user = assigneeArray.getJSONObject(i);
+                System.out.println(user.getString("name") + "  " + user.getString("displayName"));
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (AuthenticationException e) {
+            e.printStackTrace();
+        }
+
     }
 
     private void btnChooseReportActionPerformed(java.awt.event.ActionEvent evt) {//Choose .xml or .html file
@@ -202,10 +272,10 @@ public class ExportToJira extends JFrame {
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {// dispose the current screen
         dispose();
     }
-    
 
     private void cbProjectKeysActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbProjectKeysActionPerformed
-        // TODO add your handling code here:
+        String[] project_key = cbProjectKeys.getSelectedItem().toString().split(" ");
+        this.getAssignees(project_key[0]);
     }//GEN-LAST:event_cbProjectKeysActionPerformed
 
     private void tbProjectLocationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tbProjectLocationActionPerformed
@@ -270,10 +340,10 @@ public class ExportToJira extends JFrame {
 //            View.getSingleton().showMessageDialog("Done creting issues!!");
 //                this.dispose();
 //            }
-        Properties prop=new Properties();
-        InputStream input= null;
+        Properties prop = new Properties();
+        InputStream input = null;
         try {
-            input = new FileInputStream(Constant.getZapHome()+"/cred.properties");
+            input = new FileInputStream(Constant.getZapHome() + "/cred.properties");
             prop.load(input);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -282,55 +352,6 @@ public class ExportToJira extends JFrame {
         }
 
 
-
-        }//GEN-LAST:event_btnExportActionPerformed
-
-
-
-        /**
-         * @param args the command line arguments
-         */
-
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(ExportToJira.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(ExportToJira.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(ExportToJira.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(ExportToJira.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new ExportToJira().setVisible(true);
-            }
-        });
-    }
-
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnCancel;
-    private javax.swing.JButton btnChooseReport;
-    private javax.swing.JButton btnExport;
-    private javax.swing.JComboBox cbProjectKeys;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JTextField tbProjectLocation;
+    }//GEN-LAST:event_btnExportActionPerformed
     // End of variables declaration//GEN-END:variables
 }
