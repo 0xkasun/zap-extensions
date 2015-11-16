@@ -16,6 +16,7 @@ import javax.naming.AuthenticationException;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -269,9 +270,16 @@ public class ExportToJira extends JFrame {
 //            View.getSingleton().showMessageDialog("Done creting issues!!");
 //                this.dispose();
 //            }
-
-
-
+        Properties prop=new Properties();
+        InputStream input= null;
+        try {
+            input = new FileInputStream(Constant.getZapHome()+"/cred.properties");
+            prop.load(input);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
 
 
