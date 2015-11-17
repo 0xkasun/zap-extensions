@@ -28,7 +28,7 @@ public class HtmlParser {
 
     }
 
-    public String[] CreateIssueList(Document doc, String projectKey) { //create issue list
+    public String[] CreateIssueList(Document doc, String projectKey, String assignee) { //create issue list
 
         String[] issueList = new String[1000];
         String summary = null; // error name from the first column heading
@@ -73,7 +73,8 @@ public class HtmlParser {
             }
             //System.out.println(description);
             createIssueData = "{\"fields\": {\"project\": {\"key\":\"" + projectKey + "\"}," +
-                    "\"summary\":" + "\"" + summary + "\"" + ",\"description\":" + "\"" + description + "\"" + "," +
+                    "\"summary\":" + "\"" + summary + "\"" + ",  \"assignee\": {\"name\": \""+assignee+"\"}," +
+                    "\"description\":" + "\"" + description + "\"" + "," +
                     "\"issuetype\":{\"name\":\"" + type + "\"},\"priority\":{\"name\":\"" + priority + "\"}}}";
 
 //

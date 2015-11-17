@@ -180,71 +180,73 @@ public class JiraIssueCreaterForm extends javax.swing.JFrame {
     private void btnExportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportActionPerformed
         // TODO add your handling code here:
 
-        //        String auth = new String(Base64.encode(tbUserName.getText() + ":" + tbPassword.getText()));
-        //        String BASE_URL = tbJiraUrl.getText();
-        //        String[] project_key = cbProjectKeys.getSelectedItem().toString().split(" "); //use substring instead!!!
-        //        System.out.println(project_key[0]);
-        //        String issueList[];
-        //        JiraRestClient jira = new JiraRestClient();
-        //        int issueCount;
-        //        String issue;
-        //
-        //
-        //        try {
-            //
-            //            if (filePath.contains(".xml")) {
-                //
-                //                //to parse xml
-                //
-                //                XmlDomParser xmlParser = new XmlDomParser();
-                //                issueList = xmlParser.parseXmlDoc(project_key[0], filePath);
-                //
-                //
-                //                issueCount = Integer.parseInt(issueList[999]);
-                //                for (int i = 0; i < issueCount; i++) { //create Issues in jira
-                    //                    System.out.println("Issuelist " + i + issueList[i]);
-                    //                    issue = jira.invokePostMethod(auth, BASE_URL + "/rest/api/2/issue", issueList[i]);
-                    //                    filePath="";
-                    //                    System.out.println(issue);
-                    ////                    View.getSingleton().showMessageDialog("Done creting issues!!");
-                    //                }
-                //
-                //            } else if (filePath.contains(".html")) {
-                //
-                //                HtmlParser htmlParser = new HtmlParser();
-                //                issueList = htmlParser.CreateIssueList(htmlParser.ReadHtmldoc(filePath), project_key[0]);
-                //
-                //
-                //                issueCount = Integer.parseInt(issueList[999]);
-                //                for (int i = 0; i < issueCount; i++) { //create Issues in jira
-                    //                    System.out.println("Issuelist " + i + issueList[i]);
-                    //                    issue = jira.invokePostMethod(auth, BASE_URL + "/rest/api/2/issue", issueList[i]);
-                    //                    filePath="";
-                    //                    System.out.println(issue);
-                    ////                    View.getSingleton().showMessageDialog("Done creting issues!!");
-                    //
-                    //
-                    //                }
-                //            }else if(filePath.equals("")){
-                //                View.getSingleton().showMessageDialog("Please Select a report file !!");
-                //            }
-            //            }catch(AuthenticationException e1){
-            //                e1.printStackTrace();
-            //            }
-        //            finally{
-            //            View.getSingleton().showMessageDialog("Done creting issues!!");
-            //                this.dispose();
-            //            }
+
+
+        String project_key = cbProjectKeys.getSelectedItem().toString().substring(0, cbProjectKeys.getSelectedItem().toString().indexOf(" "));
+        String issueList[];
+        JiraRestClient jira = new JiraRestClient();
+        int issueCount;
+        String issue;
         Properties prop = new Properties();
         InputStream input = null;
-        try {
-            input = new FileInputStream(Constant.getZapHome() + "/cred.properties");
-            prop.load(input);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        String filePath="/home/kausn/Desktop/sample.xml";
+
+
+
+                try {
+
+                    input = new FileInputStream(Constant.getZapHome() + "/cred.properties");
+                    prop.load(input);
+                    String auth = new String(Base64.encode(prop.getProperty("jiraUsername") + ":" + prop.getProperty("jiraPass")));
+                    String BASE_URL = prop.getProperty("jiraUrl");
+
+                        if (filePath.contains(".xml")) {
+
+                                //to parse xml
+
+                                XmlDomParser xmlParser = new XmlDomParser();
+                                issueList = xmlParser.parseXmlDoc(project_key, filePath,cbSelectAssignee.getSelectedItem().toString());
+
+
+                                issueCount = Integer.parseInt(issueList[999]);
+                                for (int i = 0; i < issueCount; i++) { //create Issues in jira
+                                        System.out.println("Issuelist " + i + issueList[i]);
+                                        issue = jira.invokePostMethod(auth, BASE_URL + "/rest/api/2/issue", issueList[i]);
+//                                        filePath="";
+                                        System.out.println(issue);
+                    //                    View.getSingleton().showMessageDialog("Done creting issues!!");
+                                    }
+
+                            } else if (filePath.contains(".html")) {
+
+                                HtmlParser htmlParser = new HtmlParser();
+                                issueList = htmlParser.CreateIssueList(htmlParser.ReadHtmldoc(filePath), project_key,cbSelectAssignee.getSelectedItem().toString());
+
+
+                                issueCount = Integer.parseInt(issueList[999]);
+                                for (int i = 0; i < issueCount; i++) { //create Issues in jira
+                                        System.out.println("Issuelist " + i + issueList[i]);
+                                        issue = jira.invokePostMethod(auth, BASE_URL + "/rest/api/2/issue", issueList[i]);
+//                                        filePath="";
+                                        System.out.println(issue);
+                    //                    View.getSingleton().showMessageDialog("Done creting issues!!");
+
+
+                                    }
+                            }else if(filePath.equals("")){
+                                View.getSingleton().showMessageDialog("Please Select a report file !!");
+                            }
+                        }catch(AuthenticationException e1){
+                            e1.printStackTrace();
+                        } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally{
+                        View.getSingleton().showMessageDialog("Done creting issues!!");
+                            this.dispose();
+                        }
+
 
     }//GEN-LAST:event_btnExportActionPerformed
 

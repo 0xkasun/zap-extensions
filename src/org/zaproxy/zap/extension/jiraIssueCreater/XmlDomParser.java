@@ -21,7 +21,7 @@ public class XmlDomParser {
     String[] issueList = new String[1000];
 
 
-    public String[] parseXmlDoc(String projectKey, String filepath){
+    public String[] parseXmlDoc(String projectKey, String filepath,String assignee){
         try {
             File inputFile = new File(filepath);
             DocumentBuilderFactory dbFactory
@@ -80,8 +80,10 @@ public class XmlDomParser {
                 }
 
                 createIssueData = "{\"fields\": {\"project\": {\"key\":\"" + projectKey + "\"}," +
-                        "\"summary\":" + "\"" + summary + "\"" + ",\"description\":" + "\"" + description + "\"" + "," +
+                        "\"summary\":" + "\"" + summary + "\"" + ",  \"assignee\": {\"name\": \""+assignee+"\"}," +
+                        "\"description\":" + "\"" + description + "\"" + "," +
                         "\"issuetype\":{\"name\":\"" + type + "\"},\"priority\":{\"name\":\"" + priority + "\"}}}";
+
 
 
                 issueList[temp]=createIssueData;
