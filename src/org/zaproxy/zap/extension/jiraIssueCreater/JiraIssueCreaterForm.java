@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 /**
+ *
  * @author kausn
  */
 public class JiraIssueCreaterForm extends javax.swing.JFrame {
@@ -36,7 +37,6 @@ public class JiraIssueCreaterForm extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
-
     /**
      * Creates new form JiraIssueCreaterForm
      */
@@ -146,79 +146,79 @@ public class JiraIssueCreaterForm extends javax.swing.JFrame {
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
-                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(jLabel2)
-                                .addGap(115, 115, 115)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(cbLow)
-                                        .addComponent(cbHigh)
-                                        .addComponent(cbMedium))
-                                .addContainerGap(168, Short.MAX_VALUE))
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addComponent(jLabel2)
+                .addGap(115, 115, 115)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(cbLow)
+                    .addComponent(cbHigh)
+                    .addComponent(cbMedium))
+                .addContainerGap(168, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
-                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(jPanel1Layout.createSequentialGroup()
-                                                .addContainerGap()
-                                                .addComponent(cbHigh))
-                                        .addComponent(jLabel2))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(cbMedium)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(cbLow)
-                                .addContainerGap(15, Short.MAX_VALUE))
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(cbHigh))
+                    .addComponent(jLabel2))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(cbMedium)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(cbLow)
+                .addContainerGap(15, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addGap(66, 66, 66)
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(66, 66, 66)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                .addComponent(jLabel5)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                                                                .addComponent(jLabel5)
-                                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                                        .addGroup(layout.createSequentialGroup()
-                                                                                .addGap(100, 100, 100)
-                                                                                .addComponent(btnExport, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                                                .addGap(31, 31, 31)
-                                                                                .addComponent(btnCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                                                .addGap(0, 3, Short.MAX_VALUE))
-                                                                        .addGroup(layout.createSequentialGroup()
-                                                                                .addGap(92, 92, 92)
-                                                                                .addComponent(cbSelectAssignee, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-                                                        .addGroup(layout.createSequentialGroup()
-                                                                .addComponent(jLabel1)
-                                                                .addGap(123, 123, 123)
-                                                                .addComponent(cbProjectKeys, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                                                .addGap(73, 73, 73))))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGap(100, 100, 100)
+                                        .addComponent(btnExport, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(31, 31, 31)
+                                        .addComponent(btnCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(0, 3, Short.MAX_VALUE))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGap(92, 92, 92)
+                                        .addComponent(cbSelectAssignee, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel1)
+                                .addGap(123, 123, 123)
+                                .addComponent(cbProjectKeys, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addGap(73, 73, 73))))
         );
         layout.setVerticalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addGap(28, 28, 28)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(cbProjectKeys, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(22, 22, 22)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(jLabel5)
-                                        .addComponent(cbSelectAssignee, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(18, 18, 18)
-                                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 17, Short.MAX_VALUE)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(btnExport)
-                                        .addComponent(btnCancel))
-                                .addGap(23, 23, 23))
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(28, 28, 28)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cbProjectKeys, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(22, 22, 22)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel5)
+                    .addComponent(cbSelectAssignee, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 17, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnExport)
+                    .addComponent(btnCancel))
+                .addGap(23, 23, 23))
         );
 
         pack();
@@ -238,50 +238,50 @@ public class JiraIssueCreaterForm extends javax.swing.JFrame {
         //
         //
         //        try {
-        //
-        //            if (filePath.contains(".xml")) {
-        //
-        //                //to parse xml
-        //
-        //                XmlDomParser xmlParser = new XmlDomParser();
-        //                issueList = xmlParser.parseXmlDoc(project_key[0], filePath);
-        //
-        //
-        //                issueCount = Integer.parseInt(issueList[999]);
-        //                for (int i = 0; i < issueCount; i++) { //create Issues in jira
-        //                    System.out.println("Issuelist " + i + issueList[i]);
-        //                    issue = jira.invokePostMethod(auth, BASE_URL + "/rest/api/2/issue", issueList[i]);
-        //                    filePath="";
-        //                    System.out.println(issue);
-        ////                    View.getSingleton().showMessageDialog("Done creting issues!!");
-        //                }
-        //
-        //            } else if (filePath.contains(".html")) {
-        //
-        //                HtmlParser htmlParser = new HtmlParser();
-        //                issueList = htmlParser.CreateIssueList(htmlParser.ReadHtmldoc(filePath), project_key[0]);
-        //
-        //
-        //                issueCount = Integer.parseInt(issueList[999]);
-        //                for (int i = 0; i < issueCount; i++) { //create Issues in jira
-        //                    System.out.println("Issuelist " + i + issueList[i]);
-        //                    issue = jira.invokePostMethod(auth, BASE_URL + "/rest/api/2/issue", issueList[i]);
-        //                    filePath="";
-        //                    System.out.println(issue);
-        ////                    View.getSingleton().showMessageDialog("Done creting issues!!");
-        //
-        //
-        //                }
-        //            }else if(filePath.equals("")){
-        //                View.getSingleton().showMessageDialog("Please Select a report file !!");
-        //            }
-        //            }catch(AuthenticationException e1){
-        //                e1.printStackTrace();
-        //            }
+            //
+            //            if (filePath.contains(".xml")) {
+                //
+                //                //to parse xml
+                //
+                //                XmlDomParser xmlParser = new XmlDomParser();
+                //                issueList = xmlParser.parseXmlDoc(project_key[0], filePath);
+                //
+                //
+                //                issueCount = Integer.parseInt(issueList[999]);
+                //                for (int i = 0; i < issueCount; i++) { //create Issues in jira
+                    //                    System.out.println("Issuelist " + i + issueList[i]);
+                    //                    issue = jira.invokePostMethod(auth, BASE_URL + "/rest/api/2/issue", issueList[i]);
+                    //                    filePath="";
+                    //                    System.out.println(issue);
+                    ////                    View.getSingleton().showMessageDialog("Done creting issues!!");
+                    //                }
+                //
+                //            } else if (filePath.contains(".html")) {
+                //
+                //                HtmlParser htmlParser = new HtmlParser();
+                //                issueList = htmlParser.CreateIssueList(htmlParser.ReadHtmldoc(filePath), project_key[0]);
+                //
+                //
+                //                issueCount = Integer.parseInt(issueList[999]);
+                //                for (int i = 0; i < issueCount; i++) { //create Issues in jira
+                    //                    System.out.println("Issuelist " + i + issueList[i]);
+                    //                    issue = jira.invokePostMethod(auth, BASE_URL + "/rest/api/2/issue", issueList[i]);
+                    //                    filePath="";
+                    //                    System.out.println(issue);
+                    ////                    View.getSingleton().showMessageDialog("Done creting issues!!");
+                    //
+                    //
+                    //                }
+                //            }else if(filePath.equals("")){
+                //                View.getSingleton().showMessageDialog("Please Select a report file !!");
+                //            }
+            //            }catch(AuthenticationException e1){
+            //                e1.printStackTrace();
+            //            }
         //            finally{
-        //            View.getSingleton().showMessageDialog("Done creting issues!!");
-        //                this.dispose();
-        //            }
+            //            View.getSingleton().showMessageDialog("Done creting issues!!");
+            //                this.dispose();
+            //            }
         Properties prop = new Properties();
         InputStream input = null;
         try {
@@ -300,7 +300,7 @@ public class JiraIssueCreaterForm extends javax.swing.JFrame {
     }//GEN-LAST:event_btnCancelActionPerformed
 
     private void cbProjectKeysActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbProjectKeysActionPerformed
-        String current_project = cbProjectKeys.getSelectedItem().toString().substring(0, cbProjectKeys.getSelectedItem().toString().indexOf(" "));
+        String current_project=cbProjectKeys.getSelectedItem().toString().substring(0, cbProjectKeys.getSelectedItem().toString().indexOf(" "));
         this.getAssignees(current_project);
 
     }//GEN-LAST:event_cbProjectKeysActionPerformed
@@ -323,7 +323,7 @@ public class JiraIssueCreaterForm extends javax.swing.JFrame {
                     "/multiProjectSearch?projectKeys=" + project);
             JSONArray assigneeArray = new JSONArray(asignees);
 
-            if (cbSelectAssignee.getSelectedItem() != null) { //to stop regenerating the items in list
+            if(cbSelectAssignee.getSelectedItem()!=null){ //to stop regenerating the items in list
                 cbSelectAssignee.removeAllItems();
             }
 
