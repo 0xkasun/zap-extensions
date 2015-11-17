@@ -6,6 +6,7 @@
 package org.zaproxy.zap.extension.jiraIssueCreater;
 
 import com.sun.jersey.core.util.Base64;
+import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.parosproxy.paros.Constant;
@@ -43,7 +44,7 @@ public class ExportToJira extends JFrame {
      */
     public ExportToJira() {
         initComponents();
-        this.listJiraProjects();
+//        this.listJiraProjects();
     }
 
         /**
@@ -208,7 +209,9 @@ public class ExportToJira extends JFrame {
                     JSONObject proj = projectArray.getJSONObject(i);
 //                System.out.println("Key:" + proj.getString("key") + ", Name:" + proj.getString("name"));
                     cbProjectKeys.addItem(proj.getString("key") + " - " + proj.getString("name"));// add the projects to the combobox
+
                 }
+                AutoCompleteDecorator.decorate(cbProjectKeys);
 //            } else if (tbPassword.getPassword().toString().equals("")) {
 //                View.getSingleton().showMessageDialog("Enter Password");
 //            } else if (tbJiraUrl.getText().equals("")) {

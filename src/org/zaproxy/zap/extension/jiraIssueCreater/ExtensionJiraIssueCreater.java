@@ -169,11 +169,9 @@ public class ExtensionJiraIssueCreater extends ExtensionAdaptor {
                         }
 
 
-                        System.out.println(prop.getProperty("jiraUrl"));
-
                         if(input!=null){
 
-                            ExportToJira create_issues=new ExportToJira();
+                            JiraIssueCreaterForm create_issues=new JiraIssueCreaterForm();
                             create_issues.setTitle("Create Jira Issues");
                             create_issues.show();
                         }else{
