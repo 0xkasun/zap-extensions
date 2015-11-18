@@ -6,6 +6,7 @@
 package org.zaproxy.zap.extension.jiraIssueCreater;
 
 import com.sun.jersey.core.util.Base64;
+import org.apache.log4j.Logger;
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -20,19 +21,21 @@ import java.io.InputStream;
 import java.util.Properties;
 
 /**
- *
- * @author kausn
+ * @author kasun
  */
 public class JiraIssueCreaterForm extends javax.swing.JFrame {
 
     /**
      * Creates new form JiraIssueCreaterForm
      */
+
     public JiraIssueCreaterForm() {
         initComponents();
         this.listJiraProjects();
-        
+
     }
+
+    private Logger log = Logger.getLogger(this.getClass());
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -177,10 +180,8 @@ public class JiraIssueCreaterForm extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+
     private void btnExportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportActionPerformed
-        // TODO add your handling code here:
-
-
 
         String project_key = cbProjectKeys.getSelectedItem().toString().substring(0, cbProjectKeys.getSelectedItem().toString().indexOf(" "));
         String issueList[];
@@ -189,63 +190,40 @@ public class JiraIssueCreaterForm extends javax.swing.JFrame {
         String issue;
         Properties prop = new Properties();
         InputStream input = null;
-        String filePath="/home/kausn/Desktop/sample.xml";
 
 
+        try {
 
-                try {
+            input = new FileInputStream(Constant.getZapHome() + "/cred.properties");
+            prop.load(input);
+            String auth = new String(Base64.encode(prop.getProperty("jiraUsername") + ":" + prop.getProperty("jiraPass")));
+            String BASE_URL = prop.getProperty("jiraUrl");
 
-                    input = new FileInputStream(Constant.getZapHome() + "/cred.properties");
-                    prop.load(input);
-                    String auth = new String(Base64.encode(prop.getProperty("jiraUsername") + ":" + prop.getProperty("jiraPass")));
-                    String BASE_URL = prop.getProperty("jiraUrl");
+            if (cbProjectKeys.getSelectedItem().toString() != null &&
+                    cbSelectAssignee.getSelectedItem().toString() != null) {
 
-                        if (filePath.contains(".xml")) {
-
-                                //to parse xml
-
-                                XmlDomParser xmlParser = new XmlDomParser();
-                                issueList = xmlParser.parseXmlDoc(project_key, filePath,cbSelectAssignee.getSelectedItem().toString());
+                XmlDomParser xmlParser = new XmlDomParser();
+                issueList = xmlParser.parseXmlDoc(project_key, cbSelectAssignee.getSelectedItem().toString()); // parse xml report
 
 
-                                issueCount = Integer.parseInt(issueList[999]);
-                                for (int i = 0; i < issueCount; i++) { //create Issues in jira
-                                        System.out.println("Issuelist " + i + issueList[i]);
-                                        issue = jira.invokePostMethod(auth, BASE_URL + "/rest/api/2/issue", issueList[i]);
-//                                        filePath="";
-                                        System.out.println(issue);
-                    //                    View.getSingleton().showMessageDialog("Done creting issues!!");
-                                    }
+                issueCount = Integer.parseInt(issueList[999]);
+                for (int i = 0; i < issueCount; i++) { //create Issues in jira
+                    System.out.println("Issuelist " + i + issueList[i]);
+                    issue = jira.invokePostMethod(auth, BASE_URL + "/rest/api/2/issue", issueList[i]);
+                    System.out.println(issue); //TODO remove this apon release
+                }
 
-                            } else if (filePath.contains(".html")) {
+                View.getSingleton().showMessageDialog("Done creating issues!!");
+                this.dispose();
+            }
 
-                                HtmlParser htmlParser = new HtmlParser();
-                                issueList = htmlParser.CreateIssueList(htmlParser.ReadHtmldoc(filePath), project_key,cbSelectAssignee.getSelectedItem().toString());
-
-
-                                issueCount = Integer.parseInt(issueList[999]);
-                                for (int i = 0; i < issueCount; i++) { //create Issues in jira
-                                        System.out.println("Issuelist " + i + issueList[i]);
-                                        issue = jira.invokePostMethod(auth, BASE_URL + "/rest/api/2/issue", issueList[i]);
-//                                        filePath="";
-                                        System.out.println(issue);
-                    //                    View.getSingleton().showMessageDialog("Done creting issues!!");
-
-
-                                    }
-                            }else if(filePath.equals("")){
-                                View.getSingleton().showMessageDialog("Please Select a report file !!");
-                            }
-                        }catch(AuthenticationException e1){
-                            e1.printStackTrace();
-                        } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } finally{
-                        View.getSingleton().showMessageDialog("Done creting issues!!");
-                            this.dispose();
-                        }
+        } catch (AuthenticationException e1) {
+            log.error(e1.getMessage(), e1);
+        } catch (FileNotFoundException e) {
+            log.error(e.getMessage(), e);
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+        }
 
 
     }//GEN-LAST:event_btnExportActionPerformed
@@ -255,7 +233,7 @@ public class JiraIssueCreaterForm extends javax.swing.JFrame {
     }//GEN-LAST:event_btnCancelActionPerformed
 
     private void cbProjectKeysActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbProjectKeysActionPerformed
-        String current_project=cbProjectKeys.getSelectedItem().toString().substring(0, cbProjectKeys.getSelectedItem().toString().indexOf(" "));
+        String current_project = cbProjectKeys.getSelectedItem().toString().substring(0, cbProjectKeys.getSelectedItem().toString().indexOf(" "));
         this.getAssignees(current_project);
 
     }//GEN-LAST:event_cbProjectKeysActionPerformed
@@ -266,7 +244,7 @@ public class JiraIssueCreaterForm extends javax.swing.JFrame {
     }//GEN-LAST:event_cbSelectAssigneeActionPerformed
 
 
-    private void getAssignees(String project) { //get a list of assignees for a project
+    private void getAssignees(String project) { //get a list of assignees for a project, list in combo box cbSelectAssignee
         Properties prop = new Properties();
         InputStream input = null;
         try {
@@ -279,22 +257,21 @@ public class JiraIssueCreaterForm extends javax.swing.JFrame {
                     "/multiProjectSearch?projectKeys=" + project);
             JSONArray assigneeArray = new JSONArray(asignees);
 
-            if(cbSelectAssignee.getSelectedItem()!=null){ //to stop regenrating users
+            if (cbSelectAssignee.getSelectedItem() != null) { //to stop regenrating users
                 cbSelectAssignee.removeAllItems();
             }
-            
+
             for (int i = 0; i < assigneeArray.length(); i++) {
                 JSONObject user = assigneeArray.getJSONObject(i);
                 cbSelectAssignee.addItem(user.getString("name"));
-//                System.out.println(user.getString("name") + "  " + user.getString("displayName"));
             }
             AutoCompleteDecorator.decorate(cbSelectAssignee);
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         } catch (AuthenticationException e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
 
     }
@@ -306,39 +283,29 @@ public class JiraIssueCreaterForm extends javax.swing.JFrame {
             InputStream input = new FileInputStream(Constant.getZapHome() + "/cred.properties");
             prop.load(input);
 
-            if (!(prop.getProperty("jiraUrl").equals("")) && !(prop.getProperty("jiraUsername").equals("")) && !(prop.getProperty("jiraPass").equals(""))) {
+            if (!(prop.getProperty("jiraUrl").equals("")) && !(prop.getProperty("jiraUsername").equals(""))
+                    && !(prop.getProperty("jiraPass").equals(""))) {
 
-                //Get Projects
                 String BASE_URL = prop.getProperty("jiraUrl");
                 String auth = new String(Base64.encode(prop.getProperty("jiraUsername") + ":" + prop.getProperty("jiraPass")));
 
-//                System.out.println(BASE_URL+"----------"+auth);
                 String projects = JiraRestClient.invokeGetMethod(auth, BASE_URL + "/rest/api/2/project"); // rest call to get the list of projects
-//                System.out.println(projects);
                 JSONArray projectArray = new JSONArray(projects);
+
                 for (int i = 0; i < projectArray.length(); i++) {
                     JSONObject proj = projectArray.getJSONObject(i);
-//                System.out.println("Key:" + proj.getString("key") + ", Name:" + proj.getString("name"));
                     cbProjectKeys.addItem(proj.getString("key") + " - " + proj.getString("name"));// add the projects to the combobox
-
                 }
-                AutoCompleteDecorator.decorate(cbProjectKeys);
-//            } else if (tbPassword.getPassword().toString().equals("")) {
-//                View.getSingleton().showMessageDialog("Enter Password");
-//            } else if (tbJiraUrl.getText().equals("")) {
-//                View.getSingleton().showMessageDialog("Enter Jira Home URL");
+                AutoCompleteDecorator.decorate(cbProjectKeys); //enable auto-completion
             } else {
-                //TODO add other validations
-                return;
+                throw (new AuthenticationException("Login Error !!"));
             }
         } catch (AuthenticationException e) {
-//            e.printStackTrace();
-            View.getSingleton().showMessageDialog(e.getMessage());
+            log.error(e.getMessage(), e);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
     }
-
 
 
     /**
