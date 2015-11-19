@@ -7,6 +7,7 @@ package org.zaproxy.zap.extension.jiraIssueCreater;
 
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.log4j.Logger;
 import org.parosproxy.paros.Constant;
 import org.parosproxy.paros.control.Control;
 import org.parosproxy.paros.extension.Extension;
@@ -35,6 +36,7 @@ public class XmlDomParser {
     String createIssueData,summary,type,priority;
     String description="";
     String[] issueList = new String[1000];
+    private Logger log = Logger.getLogger(this.getClass());
 
 
     public String[] parseXmlDoc(String projectKey, String assignee ){  //parse the xml document or file
@@ -48,8 +50,6 @@ public class XmlDomParser {
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(stream);
             doc.getDocumentElement().normalize();
-            System.out.println("Root element :"
-                    + doc.getDocumentElement().getNodeName());
 
 
             NodeList alertList = doc.getElementsByTagName("alertitem"); //alert items
@@ -92,7 +92,6 @@ public class XmlDomParser {
                         "\"issuetype\":{\"name\":\"" + type + "\"},\"priority\":{\"name\":\"" + priority + "\"}}}";
 
 
-
                 issueList[temp]=createIssueData;
 
                 description="";
@@ -100,7 +99,7 @@ public class XmlDomParser {
 
             }
         } catch (Exception e) {
-            e.printStackTrace();
+           log.error(e.getMessage(),e);
         }finally {
             return issueList;
         }
