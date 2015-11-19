@@ -204,14 +204,22 @@ public class JiraIssueCreaterForm extends javax.swing.JFrame {
                 issueList = xmlParser.parseXmlDoc(project_key, cbSelectAssignee.getSelectedItem().toString()); // parse xml report
 
                 issueCount = Integer.parseInt(issueList[999]);
-                for (int i = 0; i < issueCount; i++) { //create Issues in jira
-                    System.out.println("Issuelist " + i + issueList[i]);
-                    issue = jira.invokePostMethod(auth, BASE_URL + "/rest/api/2/issue", issueList[i]);
-                    System.out.println(issue); //TODO remove this apon release
+                if(issueCount!=0) {
+                    for (int i = 0; i < issueCount; i++) { //create Issues in jira
+                        System.out.println("Issuelist " + i + issueList[i]);
+                        issue = jira.invokePostMethod(auth, BASE_URL + "/rest/api/2/issue", issueList[i]);
+                        System.out.println(issue); //TODO remove this apon release
+                    }
+
+                    View.getSingleton().showMessageDialog("Done creating issues!!");
+                    this.dispose();
+                }
+                else{
+                    View.getSingleton().showMessageDialog("No alerts found !!");
+                    this.dispose();
                 }
 
-                View.getSingleton().showMessageDialog("Done creating issues!!");
-                this.dispose();
+
             }
 
         } catch (AuthenticationException e1) { //authentication faliure
@@ -232,6 +240,9 @@ public class JiraIssueCreaterForm extends javax.swing.JFrame {
 
             log.error(e.getMessage(), e);
             this.dispose();
+        } catch (SessionNotFoundException e) {
+            log.error(e.getMessage(), e);
+
         }
 
 

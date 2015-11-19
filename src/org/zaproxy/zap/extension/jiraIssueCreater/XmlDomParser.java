@@ -30,7 +30,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
-public class XmlDomParser {
+public class XmlDomParser{
 
 
     String createIssueData,summary,type,priority;
@@ -39,7 +39,7 @@ public class XmlDomParser {
     private Logger log = Logger.getLogger(this.getClass());
 
 
-    public String[] parseXmlDoc(String projectKey, String assignee ){  //parse the xml document or file
+    public String[] parseXmlDoc(String projectKey, String assignee ) throws SessionNotFoundException{  //parse the xml document or file
         try {
 
             StringBuilder currentSession=new StringBuilder();
@@ -51,58 +51,63 @@ public class XmlDomParser {
             Document doc = dBuilder.parse(stream);
             doc.getDocumentElement().normalize();
 
+            NodeList session=doc.getElementsByTagName("alerts");
 
-            NodeList alertList = doc.getElementsByTagName("alertitem"); //alert items
-            NodeList instances;
-
-
-
-            for (int temp = 0; temp < alertList.getLength(); temp++) { //loop through alerts
-                Node nNode = alertList.item(temp);
-                Element alert=(Element) nNode;
-                instances=alert.getElementsByTagName("instance");
+            if(session.getLength()!=0) {
 
 
-
-                summary= StringEscapeUtils.escapeHtml(alert.getElementsByTagName("alert").item(0).getTextContent());
-                description+= StringEscapeUtils.escapeJava(alert.getElementsByTagName("desc").item(0).getTextContent() + "\n\n\n");
-                description+= StringEscapeUtils.escapeJava("| No of Instances | " + alert.getElementsByTagName("count").item(0).getTextContent() + " | \n");
-                description+= StringEscapeUtils.escapeJava("| Solution | " + alert.getElementsByTagName("solution").item(0).getTextContent() + " | \n");
-                description+= StringEscapeUtils.escapeJava("| Reference | " + alert.getElementsByTagName("reference").item(0).getTextContent() + " | \n");
-
-                priority= StringEscapeUtils.escapeHtml(alert.getElementsByTagName("riskdesc").item(0).getTextContent().
-                        substring(0, alert.getElementsByTagName("riskdesc").item(0).getTextContent().indexOf(" ")));
-
-                type="Bug"; //issue type set to BUG
+                NodeList alertList = doc.getElementsByTagName("alertitem"); //alert items
+                NodeList instances;
 
 
+                for (int temp = 0; temp < alertList.getLength(); temp++) { //loop through alerts
+                    Node nNode = alertList.item(temp);
+                    Element alert = (Element) nNode;
+                    instances = alert.getElementsByTagName("instance");
 
-                for (int i = 0; i < instances.getLength(); i++) { //loop through instances
 
-                    if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-                        Element eElement = (Element) nNode;
-                        description+= StringEscapeUtils.escapeHtml("| URL | " + eElement.getElementsByTagName("uri").item(i).getTextContent() + " | \\n");
+                    summary = StringEscapeUtils.escapeHtml(alert.getElementsByTagName("alert").item(0).getTextContent());
+                    description += StringEscapeUtils.escapeJava(alert.getElementsByTagName("desc").item(0).getTextContent() + "\n\n\n");
+                    description += StringEscapeUtils.escapeJava("| No of Instances | " + alert.getElementsByTagName("count").item(0).getTextContent() + " | \n");
+                    description += StringEscapeUtils.escapeJava("| Solution | " + alert.getElementsByTagName("solution").item(0).getTextContent() + " | \n");
+                    description += StringEscapeUtils.escapeJava("| Reference | " + alert.getElementsByTagName("reference").item(0).getTextContent() + " | \n");
+
+                    priority = StringEscapeUtils.escapeHtml(alert.getElementsByTagName("riskdesc").item(0).getTextContent().
+                            substring(0, alert.getElementsByTagName("riskdesc").item(0).getTextContent().indexOf(" ")));
+
+                    type = "Bug"; //issue type set to BUG
+
+
+                    for (int i = 0; i < instances.getLength(); i++) { //loop through instances
+
+                        if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+                            Element eElement = (Element) nNode;
+                            description += StringEscapeUtils.escapeHtml("| URL | " + eElement.getElementsByTagName("uri").item(i).getTextContent() + " | \\n");
+                        }
+
                     }
 
+                    createIssueData = "{\"fields\": {\"project\": {\"key\":\"" + projectKey + "\"}," +
+                            "\"summary\":" + "\"" + summary + "\"" + ",  \"assignee\": {\"name\": \"" + assignee + "\"}," +
+                            "\"description\":" + "\"" + description + "\"" + "," +
+                            "\"issuetype\":{\"name\":\"" + type + "\"},\"priority\":{\"name\":\"" + priority + "\"}}}";
+
+
+                    issueList[temp] = createIssueData;
+
+                    description = "";
+                    issueList[999] = Integer.toString(alertList.getLength());
+
+
                 }
-
-                createIssueData = "{\"fields\": {\"project\": {\"key\":\"" + projectKey + "\"}," +
-                        "\"summary\":" + "\"" + summary + "\"" + ",  \"assignee\": {\"name\": \""+assignee+"\"}," +
-                        "\"description\":" + "\"" + description + "\"" + "," +
-                        "\"issuetype\":{\"name\":\"" + type + "\"},\"priority\":{\"name\":\"" + priority + "\"}}}";
-
-
-                issueList[temp]=createIssueData;
-
-                description="";
-                issueList[999] = Integer.toString(alertList.getLength());
-
+            }else{
+                issueList[999] = "0";
+                throw(new SessionNotFoundException("Session not Found"));
             }
         } catch (Exception e) {
-           log.error(e.getMessage(),e);
-        }finally {
-            return issueList;
+            log.error(e.getMessage(), e);
         }
+        return issueList;
     }
 
 
