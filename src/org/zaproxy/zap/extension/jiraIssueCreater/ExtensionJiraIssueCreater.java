@@ -25,6 +25,7 @@ import org.parosproxy.paros.extension.ExtensionHook;
 import org.parosproxy.paros.view.View;
 import org.zaproxy.zap.view.ZapMenuItem;
 
+import javax.naming.AuthenticationException;
 import javax.swing.*;
 import java.awt.*;
 import java.io.*;
@@ -59,7 +60,6 @@ public class ExtensionJiraIssueCreater extends ExtensionAdaptor {
 //	private static String BASE_URL = "http://localhost:8081";
 
     private ZapMenuItem menuExample = null;
-    //	private RightClickMsgMenu popupMsgMenuExample = null;
     private AbstractPanel statusPanel = null;
 
     private Logger log = Logger.getLogger(this.getClass());
@@ -95,9 +95,7 @@ public class ExtensionJiraIssueCreater extends ExtensionAdaptor {
             // Register our top menu item, as long as we're not running as a daemon
             // Use one of the other methods to add to a different menu list
             extensionHook.getHookMenu().addReportMenuItem(getMenuExample());
-            // Register our popup menu item
-//	    	extensionHook.getHookMenu().addPopupMenuItem(getPopupMsgMenuExample());
-            // Register a
+
             extensionHook.getHookView().addStatusPanel(getStatusPanel());
         }
 
@@ -126,68 +124,53 @@ public class ExtensionJiraIssueCreater extends ExtensionAdaptor {
             menuExample.addActionListener(new java.awt.event.ActionListener() {
                 @Override
                 public void actionPerformed(java.awt.event.ActionEvent ae) {
-                    // This is where you do what you want to do.
-                    // In this case we'll just show a popup message.
 
-//					String auth = new String(Base64.encode("kmbkck1@gmail.com:kmbkck211"));
-//					try {
-//
-//						//to parse xml
-//
-//						XmlDomParser xmlParser = new XmlDomParser();
-//						String issueList[] = xmlParser.parseXmlDoc("PROD","/home/kasun/Desktop/sample.xml");
-//						JiraRestClient jira=new JiraRestClient();
-//
-//
-//
-//						int issueCount = Integer.parseInt(issueList[999]);
-//						for (int i = 0; i < issueCount; i++) { //create Issues in jira
-//							System.out.println("Issuelist " + i + issueList[i]);
-//							String issue = jira.invokePostMethod(auth, BASE_URL + "/rest/api/2/issue", issueList[i]);
-//							System.out.println(issue);
-//						}
-//					} catch (AuthenticationException e1) {
-//						e1.printStackTrace();
-//					}
-//					finally {
-//						View.getSingleton().showMessageDialog("Done creting issues!!");
-//					}
+                    String zap_home=Constant.getZapHome();
+                    Properties prop=new Properties();
+                    InputStream input= null;
 
-                   String zap_home=Constant.getZapHome();
+                    JiraIssueCreaterForm create_issues=new JiraIssueCreaterForm();
+                    create_issues.setTitle("Create Jira Issues");
+
+                    CredentialForm credFrm=new CredentialForm();
+                    credFrm.setTitle("Credential Form ");
+
                     File cred_file=new File(zap_home+"/cred.properties");
+
                     if(cred_file.exists()){ //if file exists read from file
 
-                        Properties prop=new Properties();
-                        InputStream input= null;
                         try {
                             input = new FileInputStream(zap_home+"/cred.properties");
                             prop.load(input);
+
+                            if(input!=null){
+                                create_issues.listJiraProjects();
+                                create_issues.show();
+                            }else{
+                                View.getSingleton().showWarningDialog(Constant.getZapHome()+"input stream null");
+                            }
+
                         } catch (FileNotFoundException e) {
+                            log.error(e.getMessage(), e);
+                            View.getSingleton().showWarningDialog("Credential file not found !!");
+                            credFrm.show();
+                            create_issues.dispose();
 
                         } catch (IOException e) {
-                            e.printStackTrace();
+                            log.error(e.getMessage(), e);
+                            create_issues.dispose();
+                        } catch (AuthenticationException e) { //jira throws a capcha user has to log and try again
+                            log.error(e.getMessage(), e);
+                            View.getSingleton().showWarningDialog("Wrong Credentials! Please login to your jira account and retry!!");
+                            cred_file.delete();
                         }
 
+                    }else{ //create credential file if not found
 
-                        if(input!=null){
-
-                            JiraIssueCreaterForm create_issues=new JiraIssueCreaterForm();
-                            create_issues.setTitle("Create Jira Issues");
-                            create_issues.show();
-                        }else{
-                            View.getSingleton().showWarningDialog(Constant.getZapHome()+"input stream null");
-                        }
-
-                    }else{
-//                        View.getSingleton().showWarningDialog(Constant.getZapHome());
-                        CredentialForm credForm= new CredentialForm();
-                        credForm.setTitle("Credential Form ");
-                        credForm.show();
+                        credFrm.show();
 
                     }
 
-                    // And display a file included with the add-on in the Output tab
-//            		displayFile(EXAMPLE_FILE);
                 }
             });
         }
