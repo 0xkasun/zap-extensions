@@ -31,8 +31,6 @@ public class JiraIssueCreaterForm extends javax.swing.JFrame {
 
     public JiraIssueCreaterForm() {
         initComponents();
-        this.listJiraProjects();
-
     }
 
     private Logger log = Logger.getLogger(this.getClass());
@@ -205,7 +203,6 @@ public class JiraIssueCreaterForm extends javax.swing.JFrame {
                 XmlDomParser xmlParser = new XmlDomParser();
                 issueList = xmlParser.parseXmlDoc(project_key, cbSelectAssignee.getSelectedItem().toString()); // parse xml report
 
-
                 issueCount = Integer.parseInt(issueList[999]);
                 for (int i = 0; i < issueCount; i++) { //create Issues in jira
                     System.out.println("Issuelist " + i + issueList[i]);
@@ -217,12 +214,24 @@ public class JiraIssueCreaterForm extends javax.swing.JFrame {
                 this.dispose();
             }
 
-        } catch (AuthenticationException e1) {
+        } catch (AuthenticationException e1) { //authentication faliure
+
             log.error(e1.getMessage(), e1);
-        } catch (FileNotFoundException e) {
+            View.getSingleton().showWarningDialog("Authentication failed Check credentials ");
+            this.dispose();
+
+        } catch (FileNotFoundException e) { //credential file not found ; show the credential form to recreate
+
             log.error(e.getMessage(), e);
-        } catch (IOException e) {
+            View.getSingleton().showWarningDialog("Credential file not found !!");
+            CredentialForm credForm =new CredentialForm();
+            credForm.show();
+            this.dispose();
+
+        } catch (IOException e) { //failed to read file
+
             log.error(e.getMessage(), e);
+            this.dispose();
         }
 
 
@@ -276,8 +285,8 @@ public class JiraIssueCreaterForm extends javax.swing.JFrame {
 
     }
 
-    private void listJiraProjects() { //list all the projects in comboBox cbProjectKeys
-        try {
+    public void listJiraProjects() throws IOException, AuthenticationException { //list all the projects in comboBox cbProjectKeys
+
 
             Properties prop = new Properties();
             InputStream input = new FileInputStream(Constant.getZapHome() + "/cred.properties");
@@ -300,11 +309,7 @@ public class JiraIssueCreaterForm extends javax.swing.JFrame {
             } else {
                 throw (new AuthenticationException("Login Error !!"));
             }
-        } catch (AuthenticationException e) {
-            log.error(e.getMessage(), e);
-        } catch (IOException e) {
-            log.error(e.getMessage(), e);
-        }
+
     }
 
 
