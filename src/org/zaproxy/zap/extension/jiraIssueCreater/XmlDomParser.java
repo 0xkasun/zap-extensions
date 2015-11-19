@@ -96,12 +96,12 @@ public class XmlDomParser{
                     issueList[temp] = createIssueData;
 
                     description = "";
-                    issueList[999] = Integer.toString(alertList.getLength());
+                    issueList[999] = Integer.toString(alertList.getLength()); //no of alerts are set to the last index of the array
 
 
                 }
             }else{
-                issueList[999] = "0";
+                issueList[999] = "0"; //no of issues set to 0 when there are no alerts found
                 throw(new SessionNotFoundException("Session not Found"));
             }
         } catch (Exception e) {

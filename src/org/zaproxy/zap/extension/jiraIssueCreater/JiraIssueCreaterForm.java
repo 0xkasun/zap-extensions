@@ -203,8 +203,8 @@ public class JiraIssueCreaterForm extends javax.swing.JFrame {
                 XmlDomParser xmlParser = new XmlDomParser();
                 issueList = xmlParser.parseXmlDoc(project_key, cbSelectAssignee.getSelectedItem().toString()); // parse xml report
 
-                issueCount = Integer.parseInt(issueList[999]);
-                if(issueCount!=0) {
+                issueCount = Integer.parseInt(issueList[999]); //get the issue count from the preset last index
+                if(issueCount!=0) { //proceed if the issue count is > 1
                     for (int i = 0; i < issueCount; i++) { //create Issues in jira
                         System.out.println("Issuelist " + i + issueList[i]);
                         issue = jira.invokePostMethod(auth, BASE_URL + "/rest/api/2/issue", issueList[i]);
@@ -214,7 +214,7 @@ public class JiraIssueCreaterForm extends javax.swing.JFrame {
                     View.getSingleton().showMessageDialog("Done creating issues!!");
                     this.dispose();
                 }
-                else{
+                else{ //abort if the issue count is = 0
                     View.getSingleton().showMessageDialog("No alerts found !!");
                     this.dispose();
                 }
@@ -222,9 +222,9 @@ public class JiraIssueCreaterForm extends javax.swing.JFrame {
 
             }
 
-        } catch (AuthenticationException e1) { //authentication faliure
+        } catch (AuthenticationException e) { //authentication faliure
 
-            log.error(e1.getMessage(), e1);
+            log.error(e.getMessage(), e);
             View.getSingleton().showWarningDialog("Authentication failed Check credentials ");
             this.dispose();
 
