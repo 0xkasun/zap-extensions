@@ -1,17 +1,33 @@
-package org.zaproxy.zap.extension.jiraIssueCreater; /**
+package org.zaproxy.zap.extension.jiraIssueCreater;
+
+
+/**
  * Created by kasun on 10/28/15.
  */
 
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.parosproxy.paros.Constant;
+import org.parosproxy.paros.control.Control;
+import org.parosproxy.paros.extension.Extension;
+import org.parosproxy.paros.extension.ExtensionLoader;
+import org.parosproxy.paros.extension.report.ReportGenerator;
+import org.parosproxy.paros.model.Model;
+import org.parosproxy.paros.model.SiteMap;
+import org.parosproxy.paros.model.SiteNode;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.zaproxy.zap.extension.XmlReporterExtension;
+import org.zaproxy.zap.utils.XMLStringUtil;
+import org.zaproxy.zap.view.ScanPanel;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.File;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 public class XmlDomParser {
 
@@ -21,13 +37,16 @@ public class XmlDomParser {
     String[] issueList = new String[1000];
 
 
-    public String[] parseXmlDoc(String projectKey, String filepath,String assignee){
+    public String[] parseXmlDoc(String projectKey, String assignee ){  //parse the xml document or file
         try {
-            File inputFile = new File(filepath);
+
+            StringBuilder currentSession=new StringBuilder();
+            String report=this.generate(currentSession);
+            InputStream stream = new ByteArrayInputStream(report.getBytes(StandardCharsets.UTF_8));
             DocumentBuilderFactory dbFactory
                     = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            Document doc = dBuilder.parse(inputFile);
+            Document doc = dBuilder.parse(stream);
             doc.getDocumentElement().normalize();
             System.out.println("Root element :"
                     + doc.getDocumentElement().getNodeName());
@@ -43,18 +62,10 @@ public class XmlDomParser {
                 Element alert=(Element) nNode;
                 instances=alert.getElementsByTagName("instance");
 
-//                System.out.println("instances :" +instances.getLength());
-//                System.out.println("Description :" +alert.getElementsByTagName("desc").item(0).getTextContent());
-//                System.out.println("alert :" +alert.getElementsByTagName("alert").item(0).getTextContent());
-//                System.out.println("Solution :" +alert.getElementsByTagName("solution").item(0).getTextContent());
-//                System.out.println("reference :" +alert.getElementsByTagName("reference").item(0).getTextContent());
-//                System.out.println("No of Instances :" +alert.getElementsByTagName("count").item(0).getTextContent());
-//                System.out.println("Risk type :" +alert.getElementsByTagName("riskdesc").item(0).getTextContent().
-//                        substring(0, alert.getElementsByTagName("riskdesc").item(0).getTextContent().indexOf(" ")));
 
 
                 summary= StringEscapeUtils.escapeHtml(alert.getElementsByTagName("alert").item(0).getTextContent());
-                description+= StringEscapeUtils.escapeJava(alert.getElementsByTagName("desc").item(0).getTextContent() + "\n");
+                description+= StringEscapeUtils.escapeJava(alert.getElementsByTagName("desc").item(0).getTextContent() + "\n\n\n");
                 description+= StringEscapeUtils.escapeJava("| No of Instances | " + alert.getElementsByTagName("count").item(0).getTextContent() + " | \n");
                 description+= StringEscapeUtils.escapeJava("| Solution | " + alert.getElementsByTagName("solution").item(0).getTextContent() + " | \n");
                 description+= StringEscapeUtils.escapeJava("| Reference | " + alert.getElementsByTagName("reference").item(0).getTextContent() + " | \n");
@@ -66,12 +77,8 @@ public class XmlDomParser {
 
 
 
-
-
-
                 for (int i = 0; i < instances.getLength(); i++) { //loop through instances
-//                    System.out.println("\nCurrent Element :"
-//                            + nNode.getNodeName());
+
                     if (nNode.getNodeType() == Node.ELEMENT_NODE) {
                         Element eElement = (Element) nNode;
                         description+= StringEscapeUtils.escapeHtml("| URL | " + eElement.getElementsByTagName("uri").item(i).getTextContent() + " | \\n");
@@ -98,4 +105,51 @@ public class XmlDomParser {
             return issueList;
         }
     }
+
+
+    // Methods copied and modified from package org.parosproxy.paros.extension.report; class ReportLastScan
+
+    public String generate(StringBuilder report) throws Exception {
+        report.append("<?xml version=\"1.0\"?>");
+        report.append("<OWASPZAPReport version=\"").append(Constant.PROGRAM_VERSION).append("\" generated=\"").append(ReportGenerator.getCurrentDateTimeString()).append("\">\r\n");
+        siteXML(report);
+        report.append("</OWASPZAPReport>");
+        return report.toString();
+    }
+
+    private void siteXML(StringBuilder report) {
+        SiteMap siteMap = Model.getSingleton().getSession().getSiteTree();
+        SiteNode root = (SiteNode) siteMap.getRoot();
+        int siteNumber = root.getChildCount();
+        for (int i = 0; i < siteNumber; i++) {
+            SiteNode site = (SiteNode) root.getChildAt(i);
+            String siteName = ScanPanel.cleanSiteName(site, true);
+            String[] hostAndPort = siteName.split(":");
+            boolean isSSL = (site.getNodeName().startsWith("https"));
+            String siteStart = "<site name=\"" + XMLStringUtil.escapeControlChrs(site.getNodeName()) + "\"" +
+                    " host=\"" + XMLStringUtil.escapeControlChrs(hostAndPort[0])+ "\""+
+                    " port=\"" + XMLStringUtil.escapeControlChrs(hostAndPort[1])+ "\""+
+                    " ssl=\"" + String.valueOf(isSSL) + "\"" +
+                    ">";
+            StringBuilder extensionsXML = getExtensionsXML(site);
+            String siteEnd = "</site>";
+            report.append(siteStart);
+            report.append(extensionsXML);
+            report.append(siteEnd);
+        }
+    }
+
+    public StringBuilder getExtensionsXML(SiteNode site) {
+        StringBuilder extensionXml = new StringBuilder();
+        ExtensionLoader loader = Control.getSingleton().getExtensionLoader();
+        int extensionCount = loader.getExtensionCount();
+        for(int i=0; i<extensionCount; i++) {
+            Extension extension = loader.getExtension(i);
+            if(extension instanceof XmlReporterExtension) {
+                extensionXml.append(((XmlReporterExtension)extension).getXml(site));
+            }
+        }
+        return extensionXml;
+    }
+
 }
