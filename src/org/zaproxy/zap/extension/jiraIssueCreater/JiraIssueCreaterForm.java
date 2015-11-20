@@ -201,8 +201,9 @@ public class JiraIssueCreaterForm extends javax.swing.JFrame {
                     cbSelectAssignee.getSelectedItem().toString() != null) {
 
                 XmlDomParser xmlParser = new XmlDomParser();
-                issueList = xmlParser.parseXmlDoc(project_key, cbSelectAssignee.getSelectedItem().toString()); // parse xml report
-
+                issueList = xmlParser.parseXmlDoc(project_key, cbSelectAssignee.getSelectedItem().toString(),
+                        cbHigh.isSelected(),cbMedium.isSelected(),cbLow.isSelected()); // parse xml report with filters
+                System.out.println(issueList.length);
                 issueCount = Integer.parseInt(issueList[999]); //get the issue count from the preset last index
                 if(issueCount!=0) { //proceed if the issue count is > 1
                     for (int i = 0; i < issueCount; i++) { //create Issues in jira
@@ -240,9 +241,6 @@ public class JiraIssueCreaterForm extends javax.swing.JFrame {
 
             log.error(e.getMessage(), e);
             this.dispose();
-        } catch (SessionNotFoundException e) {
-            log.error(e.getMessage(), e);
-
         }
 
 

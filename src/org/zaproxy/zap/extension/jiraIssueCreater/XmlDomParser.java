@@ -29,6 +29,9 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class XmlDomParser{
 
@@ -36,10 +39,14 @@ public class XmlDomParser{
     String createIssueData,summary,type,priority;
     String description="";
     String[] issueList = new String[1000];
+    static int removedIssueCount;
     private Logger log = Logger.getLogger(this.getClass());
 
 
-    public String[] parseXmlDoc(String projectKey, String assignee ) throws SessionNotFoundException{  //parse the xml document or file
+
+    public String[] parseXmlDoc(String projectKey, String assignee, Boolean alertHigh, Boolean alertMedium, Boolean alertLow) {  //parse the xml document or file
+
+        String[] returnIssueList=new String[1000];
         try {
 
             StringBuilder currentSession=new StringBuilder();
@@ -49,67 +56,131 @@ public class XmlDomParser{
                     = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(stream);
-            doc.getDocumentElement().normalize();
-
-            NodeList session=doc.getElementsByTagName("alerts");
-
-            if(session.getLength()!=0) {
+            String[] dropIssues=this.dropIssueList(alertHigh,alertMedium,alertLow);
 
 
-                NodeList alertList = doc.getElementsByTagName("alertitem"); //alert items
-                NodeList instances;
-
-
-                for (int temp = 0; temp < alertList.getLength(); temp++) { //loop through alerts
-                    Node nNode = alertList.item(temp);
-                    Element alert = (Element) nNode;
-                    instances = alert.getElementsByTagName("instance");
-
-
-                    summary = StringEscapeUtils.escapeHtml(alert.getElementsByTagName("alert").item(0).getTextContent());
-                    description += StringEscapeUtils.escapeJava(alert.getElementsByTagName("desc").item(0).getTextContent() + "\n\n\n");
-                    description += StringEscapeUtils.escapeJava("| No of Instances | " + alert.getElementsByTagName("count").item(0).getTextContent() + " | \n");
-                    description += StringEscapeUtils.escapeJava("| Solution | " + alert.getElementsByTagName("solution").item(0).getTextContent() + " | \n");
-                    description += StringEscapeUtils.escapeJava("| Reference | " + alert.getElementsByTagName("reference").item(0).getTextContent() + " | \n");
-
-                    priority = StringEscapeUtils.escapeHtml(alert.getElementsByTagName("riskdesc").item(0).getTextContent().
-                            substring(0, alert.getElementsByTagName("riskdesc").item(0).getTextContent().indexOf(" ")));
-
-                    type = "Bug"; //issue type set to BUG
-
-
-                    for (int i = 0; i < instances.getLength(); i++) { //loop through instances
-
-                        if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-                            Element eElement = (Element) nNode;
-                            description += StringEscapeUtils.escapeHtml("| URL | " + eElement.getElementsByTagName("uri").item(i).getTextContent() + " | \\n");
-                        }
-
-                    }
-
-                    createIssueData = "{\"fields\": {\"project\": {\"key\":\"" + projectKey + "\"}," +
-                            "\"summary\":" + "\"" + summary + "\"" + ",  \"assignee\": {\"name\": \"" + assignee + "\"}," +
-                            "\"description\":" + "\"" + description + "\"" + "," +
-                            "\"issuetype\":{\"name\":\"" + type + "\"},\"priority\":{\"name\":\"" + priority + "\"}}}";
-
-
-                    issueList[temp] = createIssueData;
-
-                    description = "";
-                    issueList[999] = Integer.toString(alertList.getLength()); //no of alerts are set to the last index of the array
-
-
-                }
-            }else{
-                issueList[999] = "0"; //no of issues set to 0 when there are no alerts found
-                throw(new SessionNotFoundException("Session not Found"));
+            for(String s: dropIssues){
+                System.out.println(s);
             }
+
+            if(dropIssues!=null) { //if there are issues to be dropped
+
+                this.createIssueList(doc, projectKey, assignee); //creates the issue list
+                int issueCount=Integer.parseInt(issueList[999]);
+                int exportIssueCount = dropIssues.length;
+                List<String> list = new ArrayList<>(Arrays.asList(issueList));
+
+                for (int i = 0; i <issueCount;i++ ){
+                    for(int j=0;j<exportIssueCount;j++){
+                        if (issueList[i].contains(dropIssues[j])){
+                            list.remove(issueList[i]);
+                            removedIssueCount++;
+                        }
+                    }
+                }
+                returnIssueList = list.toArray(new String[list.size()+removedIssueCount]); //check
+                returnIssueList[999]=Integer.toString((Integer.parseInt(issueList[999]) - removedIssueCount));
+                System.out.println("issue count :"+returnIssueList[999]);
+
+            }else{
+                return createIssueList(doc, projectKey, assignee); //create the issue list
+            }
+
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
+        return returnIssueList;
+    }
+
+    private String[] createIssueList(Document doc,String projectKey, String assignee) throws SessionNotFoundException{
+        doc.getDocumentElement().normalize();
+        NodeList session=doc.getElementsByTagName("alerts"); //to check wheter alerts exist
+
+        if(session.getLength()!=0) {
+
+            NodeList alertList = doc.getElementsByTagName("alertitem"); //alert items
+            NodeList instances;
+
+
+            for (int temp = 0; temp < alertList.getLength(); temp++) { //loop through alerts
+                Node nNode = alertList.item(temp);
+                Element alert = (Element) nNode;
+
+                priority = StringEscapeUtils.escapeHtml(alert.getElementsByTagName("riskdesc").item(0).getTextContent().
+                        substring(0, alert.getElementsByTagName("riskdesc").item(0).getTextContent().indexOf(" ")));
+
+                instances = alert.getElementsByTagName("instance");
+                summary = StringEscapeUtils.escapeHtml(alert.getElementsByTagName("alert").item(0).getTextContent());
+                description += StringEscapeUtils.escapeJava(alert.getElementsByTagName("desc").item(0).getTextContent() + "\n\n\n");
+                description += StringEscapeUtils.escapeJava("| No of Instances | " + alert.getElementsByTagName("count").item(0).getTextContent() + " | \n");
+                description += StringEscapeUtils.escapeJava("| Solution | " + alert.getElementsByTagName("solution").item(0).getTextContent() + " | \n");
+                description += StringEscapeUtils.escapeJava("| Reference | " + alert.getElementsByTagName("reference").item(0).getTextContent() + " | \n");
+
+                for (int i = 0; i < instances.getLength(); i++) { //loop through instances
+
+                    if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+                        Element eElement = (Element) nNode;
+                        description += StringEscapeUtils.escapeHtml("| URL | " + eElement.getElementsByTagName("uri").item(i).getTextContent() + " | \\n");
+                    }
+
+                    type = "Bug"; //issue type set to BUG
+
+                }
+
+                createIssueData = "{\"fields\": {\"project\": {\"key\":\"" + projectKey + "\"}," +
+                        "\"summary\":" + "\"" + summary + "\"" + ",  \"assignee\": {\"name\": \"" + assignee + "\"}," +
+                        "\"description\":" + "\"" + description + "\"" + "," +
+                        "\"issuetype\":{\"name\":\"" + type + "\"},\"priority\":{\"name\":\"" + priority + "\"}}}";
+
+                issueList[temp] = createIssueData;
+                description = "";
+                issueList[999] = Integer.toString(alertList.getLength()); //no of alerts are set to the last index of the array
+            }
+        }else{
+            issueList[999] = "0"; //no of issues set to 0 when there are no alerts found
+            throw(new SessionNotFoundException("Session not Found"));
+        }
+
         return issueList;
     }
 
+    private String[] dropIssueList(Boolean high,Boolean medium, Boolean low){ //get the filters into an array
+
+        if(high && medium && low){
+           String[] priorities=null;
+            return priorities;
+
+        }else if(high && medium){
+            String[] priorities={"Low"};
+            return priorities;
+
+        }else if(high){
+            String[] priorities={"Medium","Low"};
+            return priorities;
+
+        }else if(high && low){
+            String[] priorities={"Medium"};
+            return priorities;
+
+        }else if(low && medium){
+            String[] priorities={"High"};
+            return priorities;
+
+        }else if(medium){
+            String[] priorities={"High","Low"};
+            return priorities;
+
+        }else if(low){
+            String[] priorities={"High","Medium"};
+            return priorities;
+
+        }else{
+            String[] priorities={"High","Medium","Low"};
+            return priorities;
+        }
+
+
+    }
 
     // Methods copied and modified from package org.parosproxy.paros.extension.report; class ReportLastScan
 
