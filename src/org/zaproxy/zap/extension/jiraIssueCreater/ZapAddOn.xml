@@ -1,8 +1,8 @@
 <zapaddon>
 	<name>Jira Issue Creater</name>
 	<version>1</version>
-	<description>A simple extension example.</description>
-	<author>ZAP Dev Team</author>
+	<description>An extension to export alerts created by ZAP as issues to JIRA</description>
+	<author>Kasun Balasooriya</author>
 	<url></url>
 	<changes>First version</changes>
 	<extensions>

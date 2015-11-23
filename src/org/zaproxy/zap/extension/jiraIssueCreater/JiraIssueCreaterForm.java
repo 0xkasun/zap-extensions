@@ -247,23 +247,26 @@ public class JiraIssueCreaterForm extends javax.swing.JFrame {
                     cbSelectAssignee.getSelectedItem().toString() != null) {
 
                 XmlDomParser xmlParser = new XmlDomParser();
-                issueList = xmlParser.parseXmlDoc(project_key, cbSelectAssignee.getSelectedItem().toString(),
-                        cbHigh.isSelected(), cbMedium.isSelected(), cbLow.isSelected()); // parse xml report with filters
-                issueCount = issueList.length; //get the issue count from the preset last index
-                if (issueCount != 0) { //proceed if the issue count is > 1
-                    for (int i = 0; i < issueCount; i++) { //create Issues in jira
-                        issue = jira.invokePostMethod(auth, BASE_URL + "/rest/api/2/issue", issueList[i]);
-                        System.out.println(issue); //TODO remove this apon release
+                if(cbHigh.isSelected()|| cbMedium.isSelected()|| cbLow.isSelected()) {
+                        issueList = xmlParser.parseXmlDoc(project_key, cbSelectAssignee.getSelectedItem().toString(),
+                                cbHigh.isSelected(), cbMedium.isSelected(), cbLow.isSelected()); // parse xml report with filters
+                        issueCount = issueList.length; //get the issue count from the preset last index
+                    if (issueCount != 0) { //proceed if the issue count is > 1
+                        for (int i = 0; i < issueCount; i++) { //create Issues in jira
+                            issue = jira.invokePostMethod(auth, BASE_URL + "/rest/api/2/issue", issueList[i]);
+                            System.out.println(issue); //TODO remove this apon release
+                        }
+                        this.dispose();
+                        View.getSingleton().showMessageDialog("Done creating issues!!");
+
+                    } else { //abort if the issue count is = 0
+                        this.dispose();
+                        View.getSingleton().showMessageDialog("No alerts found !!");
                     }
-                    this.dispose();
-                    View.getSingleton().showMessageDialog("Done creating issues!!");
 
-                } else { //abort if the issue count is = 0
-                    this.dispose();
-                    View.getSingleton().showMessageDialog("No alerts found !!");
-
+                }else{
+                    View.getSingleton().showMessageDialog("Select alert levels to create issues !!");
                 }
-
 
             }
 
