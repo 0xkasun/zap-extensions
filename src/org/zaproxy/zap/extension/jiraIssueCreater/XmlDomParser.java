@@ -8,6 +8,7 @@ package org.zaproxy.zap.extension.jiraIssueCreater;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
+import org.json.JSONObject;
 import org.parosproxy.paros.Constant;
 import org.parosproxy.paros.control.Control;
 import org.parosproxy.paros.extension.Extension;
@@ -20,13 +21,16 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 import org.zaproxy.zap.extension.XmlReporterExtension;
 import org.zaproxy.zap.utils.XMLStringUtil;
 import org.zaproxy.zap.view.ScanPanel;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -38,15 +42,13 @@ public class XmlDomParser{
 
     String createIssueData,summary,type,priority;
     String description="";
-    String[] issueList = new String[1000];
-    static int removedIssueCount;
     private Logger log = Logger.getLogger(this.getClass());
 
 
 
     public String[] parseXmlDoc(String projectKey, String assignee, Boolean alertHigh, Boolean alertMedium, Boolean alertLow) {  //parse the xml document or file
 
-        String[] returnIssueList=new String[1000];
+        String[] returnIssueList;
         try {
 
             StringBuilder currentSession=new StringBuilder();
@@ -56,37 +58,51 @@ public class XmlDomParser{
                     = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(stream);
-            String[] dropIssues=this.dropIssueList(alertHigh,alertMedium,alertLow);
+            String[] dropIssues=this.dropIssueList(alertHigh, alertMedium, alertLow);//contains issue types to be dropped
 
 
-            for(String s: dropIssues){
-                System.out.println(s);
-            }
 
-            if(dropIssues!=null) { //if there are issues to be dropped
+            if(dropIssues.length!=0) { //if there are issues to be dropped
 
-                this.createIssueList(doc, projectKey, assignee); //creates the issue list
-                int issueCount=Integer.parseInt(issueList[999]);
+                String[] allIssues=createIssueList(doc, projectKey, assignee); //creates the issue list
+                int allIssueCount=allIssues.length;
                 int exportIssueCount = dropIssues.length;
-                List<String> list = new ArrayList<>(Arrays.asList(issueList));
+                List<String> list = new ArrayList<>(Arrays.asList(allIssues));
+                JSONObject jsonIssue,issuePriority;
+                String currentPriority;
 
-                for (int i = 0; i <issueCount;i++ ){
-                    for(int j=0;j<exportIssueCount;j++){
-                        if (issueList[i].contains(dropIssues[j])){
-                            list.remove(issueList[i]);
-                            removedIssueCount++;
+
+                for (int i = 0; i <allIssueCount;i++ ){ //for all issues
+                    for(int j=0;j<exportIssueCount;j++){ //for the alert types to be dropped
+
+                        jsonIssue=new JSONObject(allIssues[i]);
+                        currentPriority=jsonIssue.getJSONObject("fields").getJSONObject("priority").getString("name"); // get the current priority
+                        if(currentPriority.equals(dropIssues[j])){
+                            list.remove(allIssues[i]);
                         }
                     }
                 }
-                returnIssueList = list.toArray(new String[list.size()+removedIssueCount]); //check
-                returnIssueList[999]=Integer.toString((Integer.parseInt(issueList[999]) - removedIssueCount));
-                System.out.println("issue count :"+returnIssueList[999]);
+
+                returnIssueList=list.toArray(new String[list.size()]); //return the remaining issues
 
             }else{
-                return createIssueList(doc, projectKey, assignee); //create the issue list
+                returnIssueList=createIssueList(doc, projectKey, assignee); //if no issues are dropped
             }
 
+        } catch (ParserConfigurationException e) {
+            returnIssueList=new String[0];
+            log.error(e.getMessage(), e);
+        } catch (SAXException e) {
+            returnIssueList=new String[0];
+            log.error(e.getMessage(), e);
+        } catch (SessionNotFoundException e) {
+            returnIssueList=new String[0];
+            log.error(e.getMessage(), e);
+        } catch (IOException e) {
+            returnIssueList=new String[0];
+            log.error(e.getMessage(), e);
         } catch (Exception e) {
+            returnIssueList=new String[0];
             log.error(e.getMessage(), e);
         }
         return returnIssueList;
@@ -95,11 +111,13 @@ public class XmlDomParser{
     private String[] createIssueList(Document doc,String projectKey, String assignee) throws SessionNotFoundException{
         doc.getDocumentElement().normalize();
         NodeList session=doc.getElementsByTagName("alerts"); //to check wheter alerts exist
+        String[] issueList;
 
-        if(session.getLength()!=0) {
+        if(session.getLength()!=0) { // if alerts exist
 
             NodeList alertList = doc.getElementsByTagName("alertitem"); //alert items
             NodeList instances;
+            issueList=new String[alertList.getLength()]; //initialize the array according to the number of alerts
 
 
             for (int temp = 0; temp < alertList.getLength(); temp++) { //loop through alerts
@@ -134,20 +152,18 @@ public class XmlDomParser{
 
                 issueList[temp] = createIssueData;
                 description = "";
-                issueList[999] = Integer.toString(alertList.getLength()); //no of alerts are set to the last index of the array
             }
         }else{
-            issueList[999] = "0"; //no of issues set to 0 when there are no alerts found
+            issueList=new String[0]; //initialize issueList to 0 if no session is found
             throw(new SessionNotFoundException("Session not Found"));
         }
-
         return issueList;
     }
 
     private String[] dropIssueList(Boolean high,Boolean medium, Boolean low){ //get the filters into an array
 
         if(high && medium && low){
-           String[] priorities=null;
+           String[] priorities=new String[0];
             return priorities;
 
         }else if(high && medium){
