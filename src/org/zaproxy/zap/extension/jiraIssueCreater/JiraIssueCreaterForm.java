@@ -25,19 +25,6 @@ import java.util.Properties;
  */
 public class JiraIssueCreaterForm extends javax.swing.JFrame {
 
-    private Logger log = Logger.getLogger(this.getClass());
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnCancel;
-    private javax.swing.JButton btnExport;
-    private javax.swing.JCheckBox cbHigh;
-    private javax.swing.JCheckBox cbLow;
-    private javax.swing.JCheckBox cbMedium;
-    private javax.swing.JComboBox cbProjectKeys;
-    private javax.swing.JComboBox cbSelectAssignee;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JPanel jPanel1;
 
     /**
      * Creates new form JiraIssueCreaterForm
@@ -46,41 +33,7 @@ public class JiraIssueCreaterForm extends javax.swing.JFrame {
     public JiraIssueCreaterForm() {
         initComponents();
     }
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(JiraIssueCreaterForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(JiraIssueCreaterForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(JiraIssueCreaterForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(JiraIssueCreaterForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new JiraIssueCreaterForm().setVisible(true);
-            }
-        });
-    }
+    private Logger log = Logger.getLogger(this.getClass());
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -343,28 +296,75 @@ public class JiraIssueCreaterForm extends javax.swing.JFrame {
     public void listJiraProjects() throws IOException, AuthenticationException { //list all the projects in comboBox cbProjectKeys
 
 
-            Properties prop = new Properties();
-            InputStream input = new FileInputStream(Constant.getZapHome() + "/cred.properties");
-            prop.load(input);
+        Properties prop = new Properties();
+        InputStream input = new FileInputStream(Constant.getZapHome() + "/cred.properties");
+        prop.load(input);
 
-            if (!(prop.getProperty("jiraUrl").equals("")) && !(prop.getProperty("jiraUsername").equals(""))
-                    && !(prop.getProperty("jiraPass").equals(""))) {
+        if (!(prop.getProperty("jiraUrl").equals("")) && !(prop.getProperty("jiraUsername").equals(""))
+                && !(prop.getProperty("jiraPass").equals(""))) {
 
-                String BASE_URL = prop.getProperty("jiraUrl");
-                String auth = new String(Base64.encode(prop.getProperty("jiraUsername") + ":" + prop.getProperty("jiraPass")));
+            String BASE_URL = prop.getProperty("jiraUrl");
+            String auth = new String(Base64.encode(prop.getProperty("jiraUsername") + ":" + prop.getProperty("jiraPass")));
 
-                String projects = JiraRestClient.invokeGetMethod(auth, BASE_URL + "/rest/api/2/project"); // rest call to get the list of projects
-                JSONArray projectArray = new JSONArray(projects);
+            String projects = JiraRestClient.invokeGetMethod(auth, BASE_URL + "/rest/api/2/project"); // rest call to get the list of projects
+            JSONArray projectArray = new JSONArray(projects);
 
-                for (int i = 0; i < projectArray.length(); i++) {
-                    JSONObject proj = projectArray.getJSONObject(i);
-                    cbProjectKeys.addItem(proj.getString("key") + " - " + proj.getString("name"));// add the projects to the combobox
-                }
-                AutoCompleteDecorator.decorate(cbProjectKeys); //enable auto-completion
-            } else {
-                throw (new AuthenticationException("Login Error !!"));
+            for (int i = 0; i < projectArray.length(); i++) {
+                JSONObject proj = projectArray.getJSONObject(i);
+                cbProjectKeys.addItem(proj.getString("key") + " - " + proj.getString("name"));// add the projects to the combobox
             }
+            AutoCompleteDecorator.decorate(cbProjectKeys); //enable auto-completion
+        } else {
+            throw (new AuthenticationException("Login Error !!"));
+        }
 
     }
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(JiraIssueCreaterForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(JiraIssueCreaterForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(JiraIssueCreaterForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(JiraIssueCreaterForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new JiraIssueCreaterForm().setVisible(true);
+            }
+        });
+    }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnCancel;
+    private javax.swing.JButton btnExport;
+    private javax.swing.JCheckBox cbHigh;
+    private javax.swing.JCheckBox cbLow;
+    private javax.swing.JCheckBox cbMedium;
+    private javax.swing.JComboBox cbProjectKeys;
+    private javax.swing.JComboBox cbSelectAssignee;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JPanel jPanel1;
     // End of variables declaration//GEN-END:variables
 }
