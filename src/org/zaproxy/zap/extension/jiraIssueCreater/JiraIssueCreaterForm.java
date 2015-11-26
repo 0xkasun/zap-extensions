@@ -181,20 +181,16 @@ public class JiraIssueCreaterForm extends javax.swing.JFrame {
     private void btnExportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportActionPerformed
 
         String project_key = cbProjectKeys.getSelectedItem().toString().substring(0, cbProjectKeys.getSelectedItem().toString().indexOf(" "));
-        String issueList[];
+        String issueList[],creds[];
         JiraRestClient jira = new JiraRestClient();
         int issueCount;
         String issue;
-        Properties prop = new Properties();
-        InputStream input = null;
 
 
         try {
-
-            input = new FileInputStream(Constant.getZapHome() + "/cred.properties");
-            prop.load(input);
-            String auth = new String(Base64.encode(prop.getProperty("jiraUsername") + ":" + prop.getProperty("jiraPass")));
-            String BASE_URL = prop.getProperty("jiraUrl");
+            creds=this.loginUser();
+            String auth = creds[1];
+            String BASE_URL = creds[0];
 
             if (cbProjectKeys.getSelectedItem().toString() != null &&
                     cbSelectAssignee.getSelectedItem().toString() != null) {
@@ -262,13 +258,11 @@ public class JiraIssueCreaterForm extends javax.swing.JFrame {
     }//GEN-LAST:event_cbSelectAssigneeActionPerformed
 
     private void getAssignees(String project) { //get a list of assignees for a project, list in combo box cbSelectAssignee
-        Properties prop = new Properties();
-        InputStream input = null;
+        String[] creds;
         try {
-            input = new FileInputStream(Constant.getZapHome() + "/cred.properties");
-            prop.load(input);
-            String BASE_URL = prop.getProperty("jiraUrl");
-            String auth = new String(Base64.encode(prop.getProperty("jiraUsername") + ":" + prop.getProperty("jiraPass")));
+            creds=this.loginUser();
+            String BASE_URL = creds[0];
+            String auth = creds[1];
 
             String asignees = JiraRestClient.invokeGetMethod(auth, BASE_URL + "/rest/api/2/user/assignable" +
                     "/multiProjectSearch?projectKeys=" + project);
@@ -296,15 +290,9 @@ public class JiraIssueCreaterForm extends javax.swing.JFrame {
     public void listJiraProjects() throws IOException, AuthenticationException { //list all the projects in comboBox cbProjectKeys
 
 
-        Properties prop = new Properties();
-        InputStream input = new FileInputStream(Constant.getZapHome() + "/cred.properties");
-        prop.load(input);
-
-        if (!(prop.getProperty("jiraUrl").equals("")) && !(prop.getProperty("jiraUsername").equals(""))
-                && !(prop.getProperty("jiraPass").equals(""))) {
-
-            String BASE_URL = prop.getProperty("jiraUrl");
-            String auth = new String(Base64.encode(prop.getProperty("jiraUsername") + ":" + prop.getProperty("jiraPass")));
+            String[] cred=this.loginUser();
+            String BASE_URL = cred[0];
+            String auth =  cred[1];
 
             String projects = JiraRestClient.invokeGetMethod(auth, BASE_URL + "/rest/api/2/project"); // rest call to get the list of projects
             JSONArray projectArray = new JSONArray(projects);
@@ -314,11 +302,28 @@ public class JiraIssueCreaterForm extends javax.swing.JFrame {
                 cbProjectKeys.addItem(proj.getString("key") + " - " + proj.getString("name"));// add the projects to the combobox
             }
             AutoCompleteDecorator.decorate(cbProjectKeys); //enable auto-completion
-        } else {
-            throw (new AuthenticationException("Login Error !!"));
-        }
+
 
     }
+
+    public String[] loginUser() throws IOException, AuthenticationException {
+
+        Properties prop = new Properties();
+        InputStream input = new FileInputStream(Constant.getZapHome() + "/cred.properties");
+        prop.load(input);
+        String[] auth=new String[2];
+
+
+        if (!(prop.getProperty("jiraUrl").equals("")) && !(prop.getProperty("jiraUsername").equals(""))
+                && !(prop.getProperty("jiraPass").equals(""))) {
+            auth[0] = prop.getProperty("jiraUrl");
+            auth[1] = new String(Base64.encode(prop.getProperty("jiraUsername") + ":" + prop.getProperty("jiraPass")));
+        }else{
+            throw (new AuthenticationException("Login Error !!"));
+        }
+        return auth;
+    }
+
     /**
      * @param args the command line arguments
      */
