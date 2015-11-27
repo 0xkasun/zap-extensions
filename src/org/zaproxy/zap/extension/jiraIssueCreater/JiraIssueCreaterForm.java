@@ -290,9 +290,9 @@ public class JiraIssueCreaterForm extends javax.swing.JFrame {
     public void listJiraProjects() throws IOException, AuthenticationException { //list all the projects in comboBox cbProjectKeys
 
 
-            String[] cred=this.loginUser();
-            String BASE_URL = cred[0];
-            String auth =  cred[1];
+            String[] creds=this.loginUser();
+            String BASE_URL = creds[0];
+            String auth =  creds[1];
 
             String projects = JiraRestClient.invokeGetMethod(auth, BASE_URL + "/rest/api/2/project"); // rest call to get the list of projects
             JSONArray projectArray = new JSONArray(projects);
@@ -321,6 +321,7 @@ public class JiraIssueCreaterForm extends javax.swing.JFrame {
         }else{
             throw (new AuthenticationException("Login Error !!"));
         }
+        input.close();
         return auth;
     }
 
