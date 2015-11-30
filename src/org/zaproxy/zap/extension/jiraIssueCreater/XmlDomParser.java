@@ -6,8 +6,10 @@ package org.zaproxy.zap.extension.jiraIssueCreater;
  */
 
 
+import com.sun.jersey.core.util.Base64;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.parosproxy.paros.Constant;
 import org.parosproxy.paros.control.Control;
@@ -26,16 +28,19 @@ import org.zaproxy.zap.extension.XmlReporterExtension;
 import org.zaproxy.zap.utils.XMLStringUtil;
 import org.zaproxy.zap.view.ScanPanel;
 
+import javax.naming.AuthenticationException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 
 public class XmlDomParser{
 
@@ -64,15 +69,15 @@ public class XmlDomParser{
 
             if(dropIssues.length!=0) { //if there are issues to be dropped
 
-                String[] allIssues=createIssueList(doc, projectKey, assignee); //creates the issue list
+                String[] allIssues=createIssueList(doc, projectKey, assignee); //creates the issue list  TODO: check for existing issues before creating issues
                 int allIssueCount=allIssues.length;
                 int exportIssueCount = dropIssues.length;
                 List<String> list = new ArrayList<>(Arrays.asList(allIssues));
-                JSONObject jsonIssue,issuePriority;
+                JSONObject jsonIssue;
                 String currentPriority;
 
 
-                for (int i = 0; i <allIssueCount;i++ ){ //for all issues
+                for(int i = 0; i <allIssueCount;i++ ){ //for all issues
                     for(int j=0;j<exportIssueCount;j++){ //for the alert types to be dropped
 
                         jsonIssue=new JSONObject(allIssues[i]);
@@ -131,8 +136,8 @@ public class XmlDomParser{
                 summary = StringEscapeUtils.escapeHtml(alert.getElementsByTagName("alert").item(0).getTextContent());
                 description += StringEscapeUtils.escapeJava(alert.getElementsByTagName("desc").item(0).getTextContent() + "\n\n\n");
                 description += StringEscapeUtils.escapeJava("| No of Instances | " + alert.getElementsByTagName("count").item(0).getTextContent() + " | \n");
-                description += StringEscapeUtils.escapeJava("| Solution | " + alert.getElementsByTagName("solution").item(0).getTextContent() + " | \n");
-                description += StringEscapeUtils.escapeJava("| Reference | " + alert.getElementsByTagName("reference").item(0).getTextContent() + " | \n");
+                description += StringEscapeUtils.escapeJava("| Solution        | " + alert.getElementsByTagName("solution").item(0).getTextContent() + " | \n");
+                description += StringEscapeUtils.escapeJava("| Reference       | " + alert.getElementsByTagName("reference").item(0).getTextContent() + " | \n");
 
                 for (int i = 0; i < instances.getLength(); i++) { //loop through instances
 
@@ -197,6 +202,88 @@ public class XmlDomParser{
 
 
     }
+
+    public String[] loginUser() throws IOException, AuthenticationException {
+
+        Properties prop = new Properties();
+        InputStream input = new FileInputStream(Constant.getZapHome() + "/cred.properties");
+        prop.load(input);
+        String[] auth=new String[2];
+
+
+        if (!(prop.getProperty("jiraUrl").equals("")) && !(prop.getProperty("jiraUsername").equals(""))
+                && !(prop.getProperty("jiraPass").equals(""))) {
+            auth[0] = prop.getProperty("jiraUrl");
+            auth[1] = new String(Base64.encode(prop.getProperty("jiraUsername") + ":" + prop.getProperty("jiraPass")));
+        }else{
+            throw (new AuthenticationException("Login Error !!"));
+        }
+        input.close();
+        return auth;
+    }
+
+    private JSONObject getAllOpenIssues(String projectkey){
+        JiraRestClient jiraRest=new JiraRestClient();
+        String responseIssues;
+        JSONObject allOpenIssues=null;
+        try {
+            String[] creds=this.loginUser();
+            String auth=creds[1];
+            String BASE_URL = creds[0];
+            responseIssues=jiraRest.invokeGetMethod(auth, BASE_URL + "/rest/api/2/search?jql=project="+projectkey+"%20AND%20" +
+                    "(status=%22Open%22OR%20status=%22In%20Progress%22)+order+by+id&fields=key,summary,description,status&maxResults=1000");
+            allOpenIssues=new JSONObject(responseIssues);
+
+        } catch (IOException e) {
+            log.error(e.getMessage(),e);
+        } catch (AuthenticationException e) {
+            log.error(e.getMessage(), e);
+        }
+
+        return allOpenIssues;
+
+    }
+
+    public void printAllOpenIssues(String projectKey){
+        JSONObject issues=this.getAllOpenIssues(projectKey);
+        JSONArray issueArray=issues.getJSONArray("issues");
+        JSONObject tempIssue;
+        for (int i=0;i<issueArray.length();i++){
+            tempIssue=issueArray.getJSONObject(i);
+            System.out.println(tempIssue.getJSONObject("fields").getString("description"));
+            System.out.println("--------------------------hash--------------------------");
+            System.out.println(tempIssue.getJSONObject("fields").getString("description").hashCode());
+
+        }
+
+    }
+
+
+    public static String updateIssueID;
+
+    public void updateExistingIssue(String issue){
+
+    }
+
+    public boolean checkForIssueExistence(String issue, String projectKey){
+
+        JSONObject currentIssue=new JSONObject(issue);
+        JSONObject allOpenIssues=this.getAllOpenIssues(projectKey);
+        JSONArray issueArray=allOpenIssues.getJSONArray("issues");
+        Boolean existance=false;
+
+        for (int i=0;i<issueArray.length();i++){
+           if(currentIssue.getString("summary").equals(issueArray.getJSONObject(i).getString("summary"))){
+               existance=true;
+               updateIssueID=issueArray.getJSONObject(i).getString("id");
+               break;
+           }
+        }
+
+        return existance;
+    }
+
+
 
     // Methods copied and modified from package org.parosproxy.paros.extension.report; class ReportLastScan
 

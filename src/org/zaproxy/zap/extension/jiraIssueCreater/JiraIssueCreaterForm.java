@@ -184,7 +184,7 @@ public class JiraIssueCreaterForm extends javax.swing.JFrame {
         String issueList[],creds[];
         JiraRestClient jira = new JiraRestClient();
         int issueCount;
-        String issue;
+        String issue,issueID;
 
 
         try {
@@ -200,10 +200,17 @@ public class JiraIssueCreaterForm extends javax.swing.JFrame {
                         issueList = xmlParser.parseXmlDoc(project_key, cbSelectAssignee.getSelectedItem().toString(),
                                 cbHigh.isSelected(), cbMedium.isSelected(), cbLow.isSelected()); // parse xml report with filters
                         issueCount = issueList.length; //get the issue count from the preset last index
+
                     if (issueCount != 0) { //proceed if the issue count is > 1
                         for (int i = 0; i < issueCount; i++) { //create Issues in jira
-                            issue = jira.invokePostMethod(auth, BASE_URL + "/rest/api/2/issue", issueList[i]);
-                            System.out.println(issue); //TODO remove this apon release
+
+                            if(xmlParser.checkForIssueExistence(issueList[i],project_key)){ //update if the issue already exists
+                                xmlParser.updateExistingIssue(issueList[i]);
+                            }else {                                             //create a new issue if not
+                                issue = jira.invokePostMethod(auth, BASE_URL + "/rest/api/2/issue", issueList[i]);
+                                System.out.println(issue); //TODO remove this apon release
+                            }
+
                         }
                         this.dispose();
                         View.getSingleton().showMessageDialog("Done creating issues!!");
@@ -249,6 +256,8 @@ public class JiraIssueCreaterForm extends javax.swing.JFrame {
     private void cbProjectKeysActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbProjectKeysActionPerformed
         String current_project = cbProjectKeys.getSelectedItem().toString().substring(0, cbProjectKeys.getSelectedItem().toString().indexOf(" "));
         this.getAssignees(current_project);
+        XmlDomParser dom= new XmlDomParser();
+        dom.printAllOpenIssues(current_project);
 
     }//GEN-LAST:event_cbProjectKeysActionPerformed
 
@@ -303,7 +312,6 @@ public class JiraIssueCreaterForm extends javax.swing.JFrame {
             }
             AutoCompleteDecorator.decorate(cbProjectKeys); //enable auto-completion
 
-
     }
 
     public String[] loginUser() throws IOException, AuthenticationException {
@@ -324,6 +332,8 @@ public class JiraIssueCreaterForm extends javax.swing.JFrame {
         input.close();
         return auth;
     }
+
+
 
     /**
      * @param args the command line arguments

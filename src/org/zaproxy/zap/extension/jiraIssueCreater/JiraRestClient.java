@@ -41,7 +41,7 @@ public class JiraRestClient {
         return response.getEntity(String.class);
     }
 
-    private static void invokePutMethod(String auth, String url, String data) throws AuthenticationException, ClientHandlerException {
+    public static void invokePutMethod(String auth, String url, String data) throws AuthenticationException, ClientHandlerException {
         Client client = Client.create();
         WebResource webResource = client.resource(url);
         ClientResponse response = webResource.header("Authorization", "Basic " + auth).type("application/json")
