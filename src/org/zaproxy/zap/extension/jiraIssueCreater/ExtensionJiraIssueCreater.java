@@ -130,12 +130,9 @@ public class ExtensionJiraIssueCreater extends ExtensionAdaptor {
                     String zap_home=Constant.getZapHome();
                     Properties prop=new Properties();
                     InputStream input= null;
-
-                    JiraIssueCreaterForm create_issues=new JiraIssueCreaterForm();
-                    create_issues.setTitle("Create Jira Issues");
-
                     CredentialForm credFrm=new CredentialForm();
                     credFrm.setTitle("Credential Form ");
+
 
                     File cred_file=new File(zap_home+"/cred.properties");
 
@@ -146,25 +143,26 @@ public class ExtensionJiraIssueCreater extends ExtensionAdaptor {
                             prop.load(input);
 
                             if(input!=null){
+                                JiraIssueCreaterForm create_issues=new JiraIssueCreaterForm();
+                                create_issues.setTitle("Create Jira Issues");
                                 create_issues.listJiraProjects();
                                 create_issues.show();
-                            }else{
-                                View.getSingleton().showWarningDialog(Constant.getZapHome()+"input stream null");
                             }
+                            input.close();
 
                         } catch (FileNotFoundException e) {
                             log.error(e.getMessage(), e);
                             View.getSingleton().showWarningDialog("Credential file not found !!");
                             credFrm.show();
-                            create_issues.dispose();
 
                         } catch (IOException e) {
                             log.error(e.getMessage(), e);
-                            create_issues.dispose();
+
                         } catch (AuthenticationException e) { //jira throws a capcha user has to log and try again
+                            cred_file.delete();
                             log.error(e.getMessage(), e);
                             View.getSingleton().showWarningDialog("Wrong Credentials! Please login to your jira account and retry!!");
-                            cred_file.delete();
+
                         }
 
                     }else{ //create credential file if not found
