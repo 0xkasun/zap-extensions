@@ -23,6 +23,7 @@ import org.parosproxy.paros.extension.AbstractPanel;
 import org.parosproxy.paros.extension.ExtensionAdaptor;
 import org.parosproxy.paros.extension.ExtensionHook;
 import org.parosproxy.paros.view.View;
+import org.zaproxy.zap.extension.api.API;
 import org.zaproxy.zap.view.ZapMenuItem;
 
 import javax.naming.AuthenticationException;
@@ -31,8 +32,6 @@ import java.awt.*;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.text.MessageFormat;
 import java.util.Properties;
 
 /*
@@ -54,7 +53,7 @@ public class ExtensionJiraIssueCreater extends ExtensionAdaptor {
     private static final ImageIcon ICON = new ImageIcon(
             ExtensionJiraIssueCreater.class.getResource( RESOURCE + "/cake.png"));
 
-    private static final String PASS_FILE = "resources/cred.properties";
+    private JiraIssueCreaterAPI api = null;
 
 //	private static final String EXAMPLE_FILE = "files.example/ExampleFile.txt";
 //	private static String BASE_URL = "http://localhost:8081";
@@ -97,6 +96,9 @@ public class ExtensionJiraIssueCreater extends ExtensionAdaptor {
             extensionHook.getHookMenu().addReportMenuItem(getMenuExample());
 
             extensionHook.getHookView().addStatusPanel(getStatusPanel());
+            this.api=new JiraIssueCreaterAPI(this);
+            API.getInstance().registerApiImplementor(api);
+
         }
 
     }
@@ -177,36 +179,11 @@ public class ExtensionJiraIssueCreater extends ExtensionAdaptor {
         return menuExample;
     }
 
-    private void displayFile (String file) {
-        if (! View.isInitialised()) {
-            // Running in daemon mode, shouldnt have been called
-            return;
-        }
-        try {
-            File f = new File(Constant.getZapHome(), file);
-            if (! f.exists()) {
-                // This is something the user should know, so show a warning dialog
-                View.getSingleton().showWarningDialog(
-                        MessageFormat.format(
-                                Constant.messages.getString(ExtensionJiraIssueCreater.PREFIX + ".error.nofile"),
-                                f.getAbsolutePath()));
-                return;
-            }
-            // Quick way to read a small text file
-            String contents = new String(Files.readAllBytes(f.toPath()));
-            // Write to the output panel
-            View.getSingleton().getOutputPanel().append(contents);
-            // Give focus to the Output tab
-            View.getSingleton().getOutputPanel().setTabFocus();
-        } catch (Exception e) {
-            // Something unexpected went wrong, write the error to the log
-            log.error(e.getMessage(), e);
-        }
-    }
+
 
     @Override
     public String getAuthor() {
-        return Constant.ZAP_TEAM;
+        return Constant.messages.getString(PREFIX+".author");
     }
 
     @Override
