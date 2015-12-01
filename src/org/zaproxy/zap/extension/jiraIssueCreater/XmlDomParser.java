@@ -231,7 +231,8 @@ public class XmlDomParser{
             String auth=creds[1];
             String BASE_URL = creds[0];
             responseIssues=jiraRest.invokeGetMethod(auth, BASE_URL + "/rest/api/2/search?jql=project="+projectkey+"%20AND%20" +
-                    "(status=%22Open%22OR%20status=%22In%20Progress%22)+order+by+id&fields=key,summary,description,status&maxResults=1000");
+                    "(status=%22Open%22OR%20status=%22In%20Progress%22%20OR%20status=%22To%20Do%22)" +
+                    "+order+by+id&fields=key,summary,description,status&maxResults=1000");
             allOpenIssues=new JSONObject(responseIssues);
 
         } catch (IOException e) {
@@ -260,24 +261,50 @@ public class XmlDomParser{
 
 
     public static String updateIssueID;
+    public static JSONObject currentOpenIssue;
 
-    public void updateExistingIssue(String issue){
+    public void updateExistingIssue(String issue,String auth, String BASE_URL) throws AuthenticationException {
+        JSONObject currntIssue=new JSONObject(issue);
+        JiraRestClient jira=new JiraRestClient();
+
+        String  currentDescription=currntIssue.getJSONObject("fields").getString("description");
+        String currentOpenIssueDescription=currentOpenIssue.getJSONObject("fields").getString("description");
+//        System.out.println(currentOpenIssueDescription.hashCode());
+//        System.out.println(currentDescription.hashCode());
+        if(currentOpenIssueDescription.hashCode()!=currentDescription.hashCode()){ //if the descriptions are not the same
+//        System.out.println("before-----------" + currentOpenIssue);
+        String updatedDescription=StringEscapeUtils.escapeJava(currentOpenIssueDescription+currentDescription);
+        currentOpenIssue.getJSONObject("fields").put("description",updatedDescription);
+//        System.out.println("After------------"+currentOpenIssue);
+//        String editIssueData = currentOpenIssue.toString();
+//         String editIssueData = "{\"fields\": { \"assignee\": {\"name\": \"" + assignee + "\"},\"description\":\"" + description + "\"}}";
+        String editIssueData = "{\"fields\": {\"description\":\"" + updatedDescription + "\"}}";
+//        System.out.println("new issue------------" + editIssueData);
+        jira.invokePutMethod(auth, BASE_URL + "/rest/api/2/issue/" + updateIssueID, editIssueData);
+//        System.out.println("*************done*************");
+        }
 
     }
 
     public boolean checkForIssueExistence(String issue, String projectKey){
 
+        Boolean existance=false;
         JSONObject currentIssue=new JSONObject(issue);
         JSONObject allOpenIssues=this.getAllOpenIssues(projectKey);
-        JSONArray issueArray=allOpenIssues.getJSONArray("issues");
-        Boolean existance=false;
+//        System.out.println(allOpenIssues);
 
-        for (int i=0;i<issueArray.length();i++){
-           if(currentIssue.getString("summary").equals(issueArray.getJSONObject(i).getString("summary"))){
-               existance=true;
-               updateIssueID=issueArray.getJSONObject(i).getString("id");
-               break;
-           }
+        if(allOpenIssues.getJSONArray("issues").length()!=0) {
+            JSONArray issueArray = allOpenIssues.getJSONArray("issues");
+
+            for (int i = 0; i < issueArray.length(); i++) {
+                if (currentIssue.getJSONObject("fields").getString("summary").equals
+                        (issueArray.getJSONObject(i).getJSONObject("fields").getString("summary"))) {
+                    existance = true;
+                    updateIssueID = issueArray.getJSONObject(i).getString("id");
+                    currentOpenIssue = issueArray.getJSONObject(i);
+                    break;
+                }
+            }
         }
 
         return existance;

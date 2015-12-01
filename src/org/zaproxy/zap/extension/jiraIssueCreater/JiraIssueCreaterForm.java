@@ -205,7 +205,7 @@ public class JiraIssueCreaterForm extends javax.swing.JFrame {
                         for (int i = 0; i < issueCount; i++) { //create Issues in jira
 
                             if(xmlParser.checkForIssueExistence(issueList[i],project_key)){ //update if the issue already exists
-                                xmlParser.updateExistingIssue(issueList[i]);
+                                xmlParser.updateExistingIssue(issueList[i],auth,BASE_URL);
                             }else {                                             //create a new issue if not
                                 issue = jira.invokePostMethod(auth, BASE_URL + "/rest/api/2/issue", issueList[i]);
                                 System.out.println(issue); //TODO remove this apon release
@@ -256,8 +256,6 @@ public class JiraIssueCreaterForm extends javax.swing.JFrame {
     private void cbProjectKeysActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbProjectKeysActionPerformed
         String current_project = cbProjectKeys.getSelectedItem().toString().substring(0, cbProjectKeys.getSelectedItem().toString().indexOf(" "));
         this.getAssignees(current_project);
-        XmlDomParser dom= new XmlDomParser();
-        dom.printAllOpenIssues(current_project);
 
     }//GEN-LAST:event_cbProjectKeysActionPerformed
 
