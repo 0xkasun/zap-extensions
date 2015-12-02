@@ -69,7 +69,7 @@ public class XmlDomParser{
 
             if(dropIssues.length!=0) { //if there are issues to be dropped
 
-                String[] allIssues=createIssueList(doc, projectKey, assignee); //creates the issue list  TODO: check for existing issues before creating issues
+                String[] allIssues=createIssueList(doc, projectKey, assignee); //creates the issue list
                 int allIssueCount=allIssues.length;
                 int exportIssueCount = dropIssues.length;
                 List<String> list = new ArrayList<>(Arrays.asList(allIssues));
@@ -113,16 +113,20 @@ public class XmlDomParser{
         return returnIssueList;
     }
 
+    String[][] issueURLS;
+
     private String[] createIssueList(Document doc,String projectKey, String assignee) throws SessionNotFoundException{
         doc.getDocumentElement().normalize();
         NodeList session=doc.getElementsByTagName("alerts"); //to check wheter alerts exist
         String[] issueList;
+        String tempIssueURLS;
 
         if(session.getLength()!=0) { // if alerts exist
 
             NodeList alertList = doc.getElementsByTagName("alertitem"); //alert items
             NodeList instances;
             issueList=new String[alertList.getLength()]; //initialize the array according to the number of alerts
+            issueURLS=new String[alertList.getLength()][];
 
 
             for (int temp = 0; temp < alertList.getLength(); temp++) { //loop through alerts
@@ -133,6 +137,7 @@ public class XmlDomParser{
                         substring(0, alert.getElementsByTagName("riskdesc").item(0).getTextContent().indexOf(" ")));
 
                 instances = alert.getElementsByTagName("instance");
+                issueURLS[temp]=new String[instances.getLength()];
                 summary = StringEscapeUtils.escapeHtml(alert.getElementsByTagName("alert").item(0).getTextContent());
                 description += StringEscapeUtils.escapeJava(alert.getElementsByTagName("desc").item(0).getTextContent() + "\n\n\n");
                 description += StringEscapeUtils.escapeJava("| No of Instances | " + alert.getElementsByTagName("count").item(0).getTextContent() + " | \n");
@@ -143,7 +148,9 @@ public class XmlDomParser{
 
                     if (nNode.getNodeType() == Node.ELEMENT_NODE) {
                         Element eElement = (Element) nNode;
-                        description += StringEscapeUtils.escapeHtml("| URL | " + eElement.getElementsByTagName("uri").item(i).getTextContent() + " | \\n");
+                        tempIssueURLS=eElement.getElementsByTagName("uri").item(i).getTextContent();
+                        description +=StringEscapeUtils.escapeHtml("| URL | " +tempIssueURLS+ " | \\n");
+                        issueURLS[temp][i]=tempIssueURLS;
                     }
 
                     type = "Bug"; //issue type set to BUG
@@ -263,28 +270,37 @@ public class XmlDomParser{
     public static String updateIssueID;
     public static JSONObject currentOpenIssue;
 
-    public void updateExistingIssue(String issue,String auth, String BASE_URL) throws AuthenticationException {
+    public void updateExistingIssue(String issue,String auth, String BASE_URL,int currentIssueIndex) throws AuthenticationException {
         JSONObject currntIssue=new JSONObject(issue);
         JiraRestClient jira=new JiraRestClient();
 
-        String  currentDescription=currntIssue.getJSONObject("fields").getString("description");
         String currentOpenIssueDescription=currentOpenIssue.getJSONObject("fields").getString("description");
-//        System.out.println(currentOpenIssueDescription.hashCode());
-//        System.out.println(currentDescription.hashCode());
+        String  currentDescription=currntIssue.getJSONObject("fields").getString("description");
+
         if(currentOpenIssueDescription.hashCode()!=currentDescription.hashCode()){ //if the descriptions are not the same
-//        System.out.println("before-----------" + currentOpenIssue);
-        String updatedDescription=StringEscapeUtils.escapeJava(currentOpenIssueDescription+currentDescription);
-        currentOpenIssue.getJSONObject("fields").put("description",updatedDescription);
-//        System.out.println("After------------"+currentOpenIssue);
-//        String editIssueData = currentOpenIssue.toString();
-//         String editIssueData = "{\"fields\": { \"assignee\": {\"name\": \"" + assignee + "\"},\"description\":\"" + description + "\"}}";
-        String editIssueData = "{\"fields\": {\"description\":\"" + updatedDescription + "\"}}";
-//        System.out.println("new issue------------" + editIssueData);
-        jira.invokePutMethod(auth, BASE_URL + "/rest/api/2/issue/" + updateIssueID, editIssueData);
-//        System.out.println("*************done*************");
+
+            String updatedDescription=StringEscapeUtils.escapeJava(this.updateIssueURLS(currentOpenIssueDescription, currentIssueIndex));
+            currentOpenIssue.getJSONObject("fields").put("description", updatedDescription);
+
+            String editIssueData = "{\"fields\": {\"description\":\"" + updatedDescription + "\"}}";
+
+            jira.invokePutMethod(auth, BASE_URL + "/rest/api/2/issue/" + updateIssueID, editIssueData);
         }
 
     }
+
+    private String updateIssueURLS(String description,int issueIndex){
+        String updatedDescription=description;
+
+        for(int i=0;i<issueURLS[issueIndex].length;i++) {
+            if (!(description.toLowerCase().contains(issueURLS[issueIndex][i].toLowerCase()))) {
+                updatedDescription += "| URL | " + issueURLS[issueIndex][i] + " | \n";
+            }
+        }
+
+        return updatedDescription;
+    }
+
 
     public boolean checkForIssueExistence(String issue, String projectKey){
 

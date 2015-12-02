@@ -205,12 +205,11 @@ public class JiraIssueCreaterForm extends javax.swing.JFrame {
                         for (int i = 0; i < issueCount; i++) { //create Issues in jira
 
                             if(xmlParser.checkForIssueExistence(issueList[i],project_key)){ //update if the issue already exists
-                                xmlParser.updateExistingIssue(issueList[i],auth,BASE_URL);
+                                xmlParser.updateExistingIssue(issueList[i],auth,BASE_URL,i);
                             }else {                                             //create a new issue if not
                                 issue = jira.invokePostMethod(auth, BASE_URL + "/rest/api/2/issue", issueList[i]);
                                 System.out.println(issue); //TODO remove this apon release
                             }
-
                         }
                         this.dispose();
                         View.getSingleton().showMessageDialog("Done creating issues!!");
