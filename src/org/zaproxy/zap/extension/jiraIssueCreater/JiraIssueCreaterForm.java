@@ -184,7 +184,7 @@ public class JiraIssueCreaterForm extends javax.swing.JFrame {
         String issueList[],creds[];
         JiraRestClient jira = new JiraRestClient();
         int issueCount;
-        String issue,issueID;
+        String issue;
 
 
         try {

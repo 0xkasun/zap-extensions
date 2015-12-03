@@ -17,6 +17,7 @@
  */
 package org.zaproxy.zap.extension.jiraIssueCreater;
 
+import com.sun.jersey.core.util.Base64;
 import org.apache.log4j.Logger;
 import org.parosproxy.paros.Constant;
 import org.parosproxy.paros.extension.AbstractPanel;
@@ -127,23 +128,23 @@ public class ExtensionJiraIssueCreater extends ExtensionAdaptor {
                 @Override
                 public void actionPerformed(java.awt.event.ActionEvent ae) {
 
-                    String zap_home=Constant.getZapHome();
-                    Properties prop=new Properties();
-                    InputStream input= null;
-                    CredentialForm credFrm=new CredentialForm();
+                    String zap_home = Constant.getZapHome();
+                    Properties prop = new Properties();
+                    InputStream input = null;
+                    CredentialForm credFrm = new CredentialForm();
                     credFrm.setTitle("Credential Form ");
 
 
-                    File cred_file=new File(zap_home+"/cred.properties");
+                    File cred_file = new File(zap_home + "/cred.properties");
 
-                    if(cred_file.exists()){ //if file exists read from file
+                    if (cred_file.exists()) { //if file exists read from file
 
                         try {
-                            input = new FileInputStream(zap_home+"/cred.properties");
+                            input = new FileInputStream(zap_home + "/cred.properties");
                             prop.load(input);
 
-                            if(input!=null){
-                                JiraIssueCreaterForm create_issues=new JiraIssueCreaterForm();
+                            if (input != null) {
+                                JiraIssueCreaterForm create_issues = new JiraIssueCreaterForm();
                                 create_issues.setTitle("Create Jira Issues");
                                 create_issues.listJiraProjects();
                                 create_issues.show();
@@ -165,7 +166,7 @@ public class ExtensionJiraIssueCreater extends ExtensionAdaptor {
 
                         }
 
-                    }else{ //create credential file if not found
+                    } else { //create credential file if not found
 
                         credFrm.show();
 
@@ -197,4 +198,95 @@ public class ExtensionJiraIssueCreater extends ExtensionAdaptor {
             return null;
         }
     }
+
+
+    /**
+     * api methods
+     * **/
+
+    public void createJiraIssues(String projectKey,String asssignee, String high, String medium, String low){
+
+        String project_key = projectKey;
+        String issueList[],creds[];
+        JiraRestClient jira = new JiraRestClient();
+        int issueCount;
+        String issue;
+
+
+        try {
+            creds=this.loginUser();
+            String auth = creds[1];
+            String BASE_URL = creds[0];
+
+//            if (cbProjectKeys.getSelectedItem().toString() != null &&
+//                    cbSelectAssignee.getSelectedItem().toString() != null) {
+
+                XmlDomParser xmlParser = new XmlDomParser();
+                if(high.equals("true")|| medium.equals("true")|| low.equals("true")) {
+                    issueList = xmlParser.parseXmlDoc(project_key, asssignee,
+                            Boolean.valueOf(high), Boolean.valueOf(medium), Boolean.valueOf(low)); // parse xml report with filters
+                    issueCount = issueList.length; //get the issue count from the preset last index
+
+                    if (issueCount != 0) { //proceed if the issue count is > 1
+                        for (int i = 0; i < issueCount; i++) { //create Issues in jira
+
+                            if(xmlParser.checkForIssueExistence(issueList[i],project_key)){ //update if the issue already exists
+                                xmlParser.updateExistingIssue(issueList[i],auth,BASE_URL,i);
+                            }else {                                             //create a new issue if not
+                                issue = jira.invokePostMethod(auth, BASE_URL + "/rest/api/2/issue", issueList[i]);
+                                System.out.println(issue); //TODO remove this apon release
+                            }
+                        }
+
+//                        View.getSingleton().showMessageDialog("Done creating issues!!"); TODO add logs
+
+
+                    } else { //abort if the issue count is = 0
+
+//                        View.getSingleton().showMessageDialog("No alerts found !!"); TODO add logs
+                    }
+
+                }else{
+//                    View.getSingleton().showMessageDialog("Select alert levels to create issues !!"); TODO add logs
+                }
+
+//            }
+
+        } catch (AuthenticationException e) { //authentication faliure
+
+            log.error(e.getMessage(), e);
+
+        } catch (FileNotFoundException e) { //credential file not found ; show the credential form to recreate
+
+            log.error(e.getMessage(), e);
+
+        } catch (IOException e) { //failed to read file
+
+            log.error(e.getMessage(), e);
+
+        }
+
+    }
+    public String[] loginUser() throws IOException, AuthenticationException {
+
+        Properties prop = new Properties();
+        InputStream input = new FileInputStream(Constant.getZapHome() + "/cred.properties");
+        prop.load(input);
+        String[] auth=new String[2];
+
+
+        if (!(prop.getProperty("jiraUrl").equals("")) && !(prop.getProperty("jiraUsername").equals(""))
+                && !(prop.getProperty("jiraPass").equals(""))) {
+            auth[0] = prop.getProperty("jiraUrl");
+            auth[1] = new String(Base64.encode(prop.getProperty("jiraUsername") + ":" + prop.getProperty("jiraPass")));
+        }else{
+            throw (new AuthenticationException("Login Error !!"));
+        }
+        input.close();
+        return auth;
+    }
+
+
+
+
 }
