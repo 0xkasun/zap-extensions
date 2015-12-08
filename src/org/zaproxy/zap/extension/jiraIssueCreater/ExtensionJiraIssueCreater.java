@@ -95,12 +95,11 @@ public class ExtensionJiraIssueCreater extends ExtensionAdaptor {
             // Register our top menu item, as long as we're not running as a daemon
             // Use one of the other methods to add to a different menu list
             extensionHook.getHookMenu().addReportMenuItem(getMenuExample());
-
             extensionHook.getHookView().addStatusPanel(getStatusPanel());
-            this.api=new JiraIssueCreaterAPI(this);
-            API.getInstance().registerApiImplementor(api);
-
         }
+
+        this.api=new JiraIssueCreaterAPI(this);
+        API.getInstance().registerApiImplementor(api);
 
     }
 
@@ -204,6 +203,14 @@ public class ExtensionJiraIssueCreater extends ExtensionAdaptor {
      * api methods
      * **/
 
+    private static boolean stringToBool(String s) {
+        if (s.equals("1"))
+            return true;
+        if (s.equals("0"))
+            return false;
+        throw new IllegalArgumentException(s+" is not a bool. Only 1 and 0 are.");
+    }
+
     public void createJiraIssues(String projectKey,String asssignee, String high, String medium, String low){
 
         String project_key = projectKey;
@@ -222,9 +229,9 @@ public class ExtensionJiraIssueCreater extends ExtensionAdaptor {
 //                    cbSelectAssignee.getSelectedItem().toString() != null) {
 
                 XmlDomParser xmlParser = new XmlDomParser();
-                if(high.equals("true")|| medium.equals("true")|| low.equals("true")) {
+                if(high.equals("1")|| medium.equals("1")|| low.equals("1")) {
                     issueList = xmlParser.parseXmlDoc(project_key, asssignee,
-                            Boolean.valueOf(high), Boolean.valueOf(medium), Boolean.valueOf(low)); // parse xml report with filters
+                            stringToBool(high), stringToBool(medium), stringToBool(low)); // parse xml report with filters
                     issueCount = issueList.length; //get the issue count from the preset last index
 
                     if (issueCount != 0) { //proceed if the issue count is > 1
