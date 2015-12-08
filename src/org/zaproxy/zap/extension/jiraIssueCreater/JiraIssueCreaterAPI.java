@@ -77,6 +77,6 @@ public class JiraIssueCreaterAPI extends ApiImplementor {
 //                throw new ApiException(ApiException.Type.BAD_ACTION);
 
         }
-        return ApiResponseElement.OK;
+        return new ApiResponseElement(name,params.toString());
     }
 }
