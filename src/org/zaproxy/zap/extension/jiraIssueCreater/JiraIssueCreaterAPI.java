@@ -13,15 +13,19 @@ public class JiraIssueCreaterAPI extends ApiImplementor {
 
 
 
-    /** The action of creating a new empty session for a site and turns it active. */
+    /** The action of creating new Jira issues. */
     private static final String ACTION_CREATE_JIRA_ISSUE = "createJiraIssues";
 
 
 
 
-    /** The mandatory parameter required for identifying a session to which an action refers. */
+    /** The mandatory parameter required for creating new Jira issues . */
     private static final String ACTION_PARAM_PROJECTKEY = "projectKey";
     private static final String ACTION_PARAM_ASSIGNEE = "assignee";
+
+    private static final String ACTION_PARAM_BASEURL = "jiraBaseURL";
+    private static final String ACTION_PARAM_JIRAUSERNAME = "jiraUserName";
+    private static final String ACTION_PARAM_JIRAPASSWORD = "jiraPassword";
 
 
     private static final String ACTION_PARAM_HIGH = "high";
@@ -41,7 +45,8 @@ public class JiraIssueCreaterAPI extends ApiImplementor {
         super();
         this.extension=extension;
 
-        this.addApiAction(new ApiAction(ACTION_CREATE_JIRA_ISSUE, new String[] { ACTION_PARAM_PROJECTKEY,ACTION_PARAM_ASSIGNEE,
+        this.addApiAction(new ApiAction(ACTION_CREATE_JIRA_ISSUE, new String[] { ACTION_PARAM_BASEURL,ACTION_PARAM_JIRAUSERNAME,
+                ACTION_PARAM_JIRAPASSWORD, ACTION_PARAM_PROJECTKEY,ACTION_PARAM_ASSIGNEE,
                 ACTION_PARAM_HIGH,ACTION_PARAM_MEDIUM,ACTION_PARAM_LOW }));
     }
 
@@ -59,7 +64,8 @@ public class JiraIssueCreaterAPI extends ApiImplementor {
 
         switch (name) {
             case ACTION_CREATE_JIRA_ISSUE:
-                extension.createJiraIssues(params.getString(ACTION_PARAM_PROJECTKEY), params.getString(ACTION_PARAM_ASSIGNEE),
+                extension.createJiraIssues(params.getString(ACTION_PARAM_BASEURL),params.getString(ACTION_PARAM_JIRAUSERNAME),
+                        params.getString(ACTION_PARAM_JIRAPASSWORD),params.getString(ACTION_PARAM_PROJECTKEY), params.getString(ACTION_PARAM_ASSIGNEE),
                         params.getString(ACTION_PARAM_HIGH), params.getString(ACTION_PARAM_MEDIUM), params.getString(ACTION_PARAM_LOW));
 //                site = extension.getHttpSessionsSite(getAuthority(params.getString(ACTION_PARAM_PROJECTKEY)), true);
 //                if (site == null) {
