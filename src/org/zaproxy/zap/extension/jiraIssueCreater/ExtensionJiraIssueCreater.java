@@ -211,22 +211,20 @@ public class ExtensionJiraIssueCreater extends ExtensionAdaptor {
         throw new IllegalArgumentException(s+" is not a bool. Only 1 and 0 are.");
     }
 
-    public void createJiraIssues(String projectKey,String asssignee, String high, String medium, String low){
+    public void createJiraIssues(String jiraBaseURL, String jiraUserName, String jiraPassword,String projectKey,String asssignee, String high, String medium, String low){
 
         String project_key = projectKey;
-        String issueList[],creds[];
+        String issueList[];
         JiraRestClient jira = new JiraRestClient();
         int issueCount;
         String issue;
 
 
         try {
-            creds=this.loginUser();
-            String auth = creds[1];
-            String BASE_URL = creds[0];
 
-//            if (cbProjectKeys.getSelectedItem().toString() != null &&
-//                    cbSelectAssignee.getSelectedItem().toString() != null) {
+            String auth = new String(Base64.encode(jiraUserName+":"+jiraPassword));
+            String BASE_URL = jiraBaseURL;
+
 
                 XmlDomParser xmlParser = new XmlDomParser();
                 if(high.equals("1")|| medium.equals("1")|| low.equals("1")) {
@@ -241,39 +239,33 @@ public class ExtensionJiraIssueCreater extends ExtensionAdaptor {
                                 xmlParser.updateExistingIssue(issueList[i],auth,BASE_URL,i);
                             }else {                                             //create a new issue if not
                                 issue = jira.invokePostMethod(auth, BASE_URL + "/rest/api/2/issue", issueList[i]);
-                                System.out.println(issue); //TODO remove this apon release
+                                System.out.println("Created Issue : "+issue);
                             }
                         }
 
-//                        View.getSingleton().showMessageDialog("Done creating issues!!"); TODO add logs
+
 
 
                     } else { //abort if the issue count is = 0
 
-//                        View.getSingleton().showMessageDialog("No alerts found !!"); TODO add logs
+                        System.out.println("No issues forund ");
                     }
 
                 }else{
-//                    View.getSingleton().showMessageDialog("Select alert levels to create issues !!"); TODO add logs
+
+                    System.out.println("No alert levels to create issues !!");
                 }
 
-//            }
+
 
         } catch (AuthenticationException e) { //authentication faliure
-
-            log.error(e.getMessage(), e);
-
-        } catch (FileNotFoundException e) { //credential file not found ; show the credential form to recreate
-
-            log.error(e.getMessage(), e);
-
-        } catch (IOException e) { //failed to read file
 
             log.error(e.getMessage(), e);
 
         }
 
     }
+
     public String[] loginUser() throws IOException, AuthenticationException {
 
         Properties prop = new Properties();
@@ -292,8 +284,6 @@ public class ExtensionJiraIssueCreater extends ExtensionAdaptor {
         input.close();
         return auth;
     }
-
-
 
 
 }
