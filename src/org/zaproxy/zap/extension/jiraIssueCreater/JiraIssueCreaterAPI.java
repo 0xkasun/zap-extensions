@@ -33,11 +33,6 @@ public class JiraIssueCreaterAPI extends ApiImplementor {
     private static final String ACTION_PARAM_LOW = "low";
 
 
-
-
-
-
-
     private static final String PREFIX = "jiraIssueCreater";
     private ExtensionJiraIssueCreater extension;
 
@@ -67,21 +62,6 @@ public class JiraIssueCreaterAPI extends ApiImplementor {
                 extension.createJiraIssues(params.getString(ACTION_PARAM_BASEURL),params.getString(ACTION_PARAM_JIRAUSERNAME),
                         params.getString(ACTION_PARAM_JIRAPASSWORD),params.getString(ACTION_PARAM_PROJECTKEY), params.getString(ACTION_PARAM_ASSIGNEE),
                         params.getString(ACTION_PARAM_HIGH), params.getString(ACTION_PARAM_MEDIUM), params.getString(ACTION_PARAM_LOW));
-//                site = extension.getHttpSessionsSite(getAuthority(params.getString(ACTION_PARAM_PROJECTKEY)), true);
-//                if (site == null) {
-//                    throw new ApiException(ApiException.Type.ILLEGAL_PARAMETER, ACTION_PARAM_PROJECTKEY);
-//                }
-//                final String sessionName = getParam(params, ACTION_PARAM_SESSION, "");
-//                if ("".equals(sessionName)) {
-//                    site.createEmptySession();
-//                } else {
-//                    site.createEmptySession(sessionName);
-//                }
-//                return ApiResponseElement.OK;
-
-
-//                throw new ApiException(ApiException.Type.BAD_ACTION);
-
         }
         return new ApiResponseElement(name,params.toString());
     }

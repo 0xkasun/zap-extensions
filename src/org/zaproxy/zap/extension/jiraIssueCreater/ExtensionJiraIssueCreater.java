@@ -36,7 +36,7 @@ import java.net.URL;
 import java.util.Properties;
 
 /*
- * An example ZAP extension which adds a top level menu item.
+ * An extension to create jira issues from alerts from the current session.
  *
  * This class is defines the extension.
  */
@@ -56,8 +56,6 @@ public class ExtensionJiraIssueCreater extends ExtensionAdaptor {
 
     private JiraIssueCreaterAPI api = null;
 
-//	private static final String EXAMPLE_FILE = "files.example/ExampleFile.txt";
-//	private static String BASE_URL = "http://localhost:8081";
 
     private ZapMenuItem menuExample = null;
     private AbstractPanel statusPanel = null;
@@ -211,7 +209,8 @@ public class ExtensionJiraIssueCreater extends ExtensionAdaptor {
         throw new IllegalArgumentException(s+" is not a bool. Only 1 and 0 are.");
     }
 
-    public void createJiraIssues(String jiraBaseURL, String jiraUserName, String jiraPassword,String projectKey,String asssignee, String high, String medium, String low){
+    public void createJiraIssues(String jiraBaseURL, String jiraUserName, String jiraPassword,
+                                 String projectKey,String asssignee, String high, String medium, String low){
 
         String project_key = projectKey;
         String issueList[];
@@ -242,9 +241,6 @@ public class ExtensionJiraIssueCreater extends ExtensionAdaptor {
                                 System.out.println("Created Issue : "+issue);
                             }
                         }
-
-
-
 
                     } else { //abort if the issue count is = 0
 
